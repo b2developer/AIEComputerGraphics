@@ -99,6 +99,8 @@ bool Application::update()
 	return true;
 }
 
+#include "GameObject.h"
+#include "Transform.h"
 #include "Camera.h"
 
 //render function, runs after the update
@@ -111,7 +113,7 @@ void Application::draw()
 	glClearColor(0.25f, 0.25f, 0.25f, 1); //fills the screen with a solid colour
 	glEnable(GL_DEPTH_TEST); //enables the depth buffer to be used this render call
 
-	Camera* c = new Camera(vec3(10,10,10), vec3(0,-1,-1), 0.01f, 100.0f, glm::pi<float>() * 0.25f, 16 / 9.0f);
+	Camera* c = new Camera(0.01f, 100.0f, glm::pi<float>() * 0.25f, 16 / 9.0f);
 	c->calculateMatrices();
 
 	Gizmos::clear(); //removes all existing gizmos
@@ -127,7 +129,7 @@ void Application::draw()
 		Gizmos::addLine(vec3(10, 0, -10 + i), vec3(-10, 0, -10 + i), i == 10 ? white : black);
 	}
 
-	Gizmos::draw(c->projectionMatrix * c->worldModelMatrix);
+	Gizmos::draw(c->projectionMatrix * c->gameObject->transform->translationMatrix);
 
 	delete c;
 }

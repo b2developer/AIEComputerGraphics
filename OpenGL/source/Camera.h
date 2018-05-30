@@ -1,26 +1,25 @@
 #pragma once
+#include "Component.h"
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
 using namespace glm;
 
+//forward declaration
+class Transform;
+
 /*
 * class Camera
+* child class of Component
 *
 * provides a virtual viewpoint for a scene to render geometry
 *
 * @author: Bradley Booth, Academy of Interactive Entertainment, 2018
-*
-a
 */
-class Camera
+class Camera : public Component
 {
 public:
-
-	//entity properties
-	vec3 position;
-	vec3 forward;
 
 	//camera properties
 	float nearPlane;
@@ -30,26 +29,24 @@ public:
 	
 	//calculated properties
 	mat4 projectionMatrix;
-	mat4 worldModelMatrix;
+	mat4 viewMatrix;
 
 	/*
 	* Camera()
 	* constructor, assigns properties
 	*
-	* @param vec3 inPosition - the position of the camera
-	* @param vec3 inForward - the forward direction of the camera
 	* @param float inNP - the distance of the near plane
 	* @param float inFP - the distance of the far plane
 	* @param float inFOV - the field-of-view of the camera
 	* @param float inAR - the aspect ratio of the display the camera is rendering to
 	*/
-	Camera(vec3 inPosition, vec3 inForward, float inNP, float inFP, float inFOV, float inAR);
+	Camera(float inNP, float inFP, float inFOV, float inAR);
 
 	/*
 	* ~Camera()
 	* default destructor
 	*/
-	~Camera();
+	~Camera() {};
 
 	/*
 	* calculateMatrices
@@ -61,4 +58,24 @@ public:
 	*/
 	void calculateMatrices();
 
+	/*
+	* start
+	* overrides Component's start()
+	*
+	* called when the object is created
+	*
+	* @returns void
+	*/
+	void start() override;
+
+	/*
+	* update
+	* overrides Component's update(float deltaTime)
+	*
+	* called once per frame
+	*
+	* @param float deltaTime - amount of time passed since the last frame
+	* @returns void
+	*/
+	void update(float deltaTime) override {};
 };
