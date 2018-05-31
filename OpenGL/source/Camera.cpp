@@ -22,4 +22,6 @@ void Camera::start()
 {
 	function<void()> f = [this] { calculateMatrices(); };
 	gameObject->transform->OnTransformUpdate.push_back(f);
+
+	calculateMatrices();
 }

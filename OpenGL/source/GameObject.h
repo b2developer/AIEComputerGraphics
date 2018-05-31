@@ -37,4 +37,25 @@ public:
 	* destructor, removes all components
 	*/
 	~GameObject();
+
+	/*
+	* update
+	*
+	* called once per frame
+	* updates all components
+	*
+	* @param float deltaTime - the amount of passed since the last frame
+	* @returns void
+	*/
+	void update(float deltaTime);
+
+	/*
+	* draw
+	*
+	* called once per frame afte the update loop
+	* draws all components
+	*
+	* @returns void
+	*/
+	void draw();
 };

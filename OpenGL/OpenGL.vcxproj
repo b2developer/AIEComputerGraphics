@@ -153,7 +153,9 @@
     <ClCompile Include="source\GameObject.cpp" />
     <ClCompile Include="source\Gizmos.cpp" />
     <ClCompile Include="source\gl_core_4_4.c" />
+    <ClCompile Include="source\Input.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\Scene.cpp" />
     <ClCompile Include="source\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -163,6 +165,9 @@
     <ClInclude Include="source\GameObject.h" />
     <ClInclude Include="source\Gizmos.h" />
     <ClInclude Include="source\gl_core_4_4.h" />
+    <ClInclude Include="source\Input.h" />
+    <ClInclude Include="source\InputCallbacks.h" />
+    <ClInclude Include="source\Scene.h" />
     <ClInclude Include="source\Transform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

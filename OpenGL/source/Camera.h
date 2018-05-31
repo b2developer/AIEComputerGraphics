@@ -77,5 +77,15 @@ public:
 	* @param float deltaTime - amount of time passed since the last frame
 	* @returns void
 	*/
-	void update(float deltaTime) override {};
+	void update(float deltaTime) override {}
+
+	/*
+	* draw
+	* overrides Component's draw()
+	*
+	* called once per frame after the update loop
+	*
+	* @returns void
+	*/
+	void draw() override {}
 };

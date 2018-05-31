@@ -42,6 +42,12 @@
     <ClCompile Include="source\Transform.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
+    <ClCompile Include="source\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Gizmos.h">
@@ -64,6 +70,15 @@
     </ClInclude>
     <ClInclude Include="source\Transform.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\InputCallbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Input.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

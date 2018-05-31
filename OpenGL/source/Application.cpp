@@ -2,9 +2,16 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <functional>
+#include <string>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+
+#include "InputCallbacks.h"
+#include "GameObject.h"
+#include "Transform.h"
+#include "Camera.h"
 
 //constructor
 Application::Application()
@@ -36,6 +43,8 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 		return false;
 	}
 
+	INP->gameWindow = window;
+
 	glfwMakeContextCurrent(window);
 
 	//open gl initialisation check
@@ -47,6 +56,9 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 		return false;
 	}
 
+	glfwSetKeyCallback(window, &onKeyModified);
+	glfwSetCursorPosCallback(window, &onMouseModified);
+
 	//log the open gl version to the console
 	auto major = ogl_GetMajorVersion();
 	auto minor = ogl_GetMinorVersion();
@@ -56,12 +68,25 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	//initialise gizmos
 	Gizmos::create(10000, 10000, 10000, 10000);
 
+	scene = new Scene();
+
+	cameraObject = new GameObject();
+
+	Camera* camera = new Camera(0.01f, 100.0f, glm::pi<float>() * 0.25f, 16 / 9.0f);
+	camera->gameObject = cameraObject;
+	cameraObject->components.push_back(camera);
+	camera->start();
+
+	INP->setCursorLockMode(ECursorLock::NONE);
+
 	return true;
 }
 
 //runs when the update function stops looping
 void Application::shutdown()
 {
+	delete scene;
+
 	//destroy the window
 	glfwDestroyWindow(window);
 	glfwTerminate();
@@ -73,6 +98,11 @@ bool Application::update()
 	//window isn't trying to close itself
 	if (glfwWindowShouldClose(window) == false)
 	{
+		double time = glfwGetTime();
+
+		//calculate the different in the time points to get dt
+		double deltaTime = time - lastTime;
+
 		//close if escape is pressed
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		{
@@ -81,15 +111,17 @@ bool Application::update()
 		
 		//Game Logic
 		//-------------------
-
-		
-
+		scene->update((float)deltaTime);
 		//-------------------
 
 		draw();
 
+		INP->deltaReset();
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+		lastTime = time;
 	}
 	else
 	{
@@ -99,22 +131,16 @@ bool Application::update()
 	return true;
 }
 
-#include "GameObject.h"
-#include "Transform.h"
-#include "Camera.h"
-
 //render function, runs after the update
 void Application::draw()
 {
-	mat4 view = glm::lookAt(vec3(10, 10, 10), vec3(10, 0, 0), vec3(0, 1, 0));
-	mat4 projection = glm::perspective(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the screen and depth buffers
 	glClearColor(0.25f, 0.25f, 0.25f, 1); //fills the screen with a solid colour
 	glEnable(GL_DEPTH_TEST); //enables the depth buffer to be used this render call
 
-	Camera* c = new Camera(0.01f, 100.0f, glm::pi<float>() * 0.25f, 16 / 9.0f);
-	c->calculateMatrices();
+	scene->draw();
+
+	Camera* c = (Camera*)cameraObject->components[1];
 
 	Gizmos::clear(); //removes all existing gizmos
 
@@ -130,6 +156,4 @@ void Application::draw()
 	}
 
 	Gizmos::draw(c->projectionMatrix * c->gameObject->transform->translationMatrix);
-
-	delete c;
 }

@@ -60,6 +60,16 @@ public:
 	void start() override {};
 
 	/*
+	* onTransformUpdate
+	*
+	* should be called whenever the transform is updated
+	* ensures that the matrix reflects the isolated values
+	*
+	* @returns void
+	*/
+	void onTransformUpdate();
+
+	/*
 	* update
 	* override Component's update(float deltaTime)
 	*
@@ -71,12 +81,12 @@ public:
 	void update(float deltaTime) override {};
 
 	/*
-	* onTransformUpdate
+	* draw
+	* overrides Component's draw()
 	*
-	* should be called whenever the transform is updated
-	* ensures that the matrix reflects the isolated values
+	* called once per frame after the update loop
 	*
 	* @returns void
 	*/
-	void onTransformUpdate();
+	void draw() override {}
 };

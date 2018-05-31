@@ -21,13 +21,13 @@ public:
 	* Component()
 	* default constructor
 	*/
-	Component() {};
+	Component() {}
 
 	/*
 	* ~Component()
 	* default destructor
 	*/
-	virtual ~Component() {};
+	virtual ~Component() {}
 
 	/*
 	* start
@@ -37,7 +37,7 @@ public:
 	*
 	* @returns void
 	*/
-	virtual void start() {};
+	virtual void start() {}
 
 	/*
 	* update
@@ -48,5 +48,15 @@ public:
 	* @param float deltaTime - the amount of time passed since the last frame
 	* @param returns void
 	*/
-	virtual void update(float deltaTime) {};
+	virtual void update(float deltaTime) {}
+
+	/*
+	* draw
+	* virtual function
+	*
+	* called once per frame after the update loop
+	*
+	* @returns void
+	*/
+	virtual void draw() {}
 };

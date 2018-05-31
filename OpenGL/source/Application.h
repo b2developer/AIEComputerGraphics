@@ -5,6 +5,9 @@
 
 #include "Gizmos.h"
 
+#include "Scene.h"
+#include "GameObject.h"
+
 using namespace glm;
 using namespace aie;
 
@@ -20,10 +23,17 @@ const int MAX_NAME = 200;
 */
 class Application
 {
+private:
+
+	double lastTime = 0.0f;
+
 public:
 
 	//window of the application
 	GLFWwindow * window;
+
+	Scene* scene;
+	GameObject* cameraObject;
 
 	/*
 	* Application()
