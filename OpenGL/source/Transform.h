@@ -47,7 +47,7 @@ public:
 	* Transform()
 	* default destructor
 	*/
-	~Transform() {};
+	~Transform() {}
 
 	/*
 	* start
@@ -57,7 +57,7 @@ public:
 	*
 	* @returns void
 	*/
-	void start() override {};
+	void start() override {}
 
 	/*
 	* onTransformUpdate
@@ -78,7 +78,7 @@ public:
 	* @param float deltaTime - the amount of time passed since the last frame
 	* @returns void
 	*/
-	void update(float deltaTime) override {};
+	void update(float deltaTime) override {}
 
 	/*
 	* draw
@@ -86,7 +86,8 @@ public:
 	*
 	* called once per frame after the update loop
 	*
+	* @param mat4 viewProjection - the camera matrix
 	* @returns void
 	*/
-	void draw() override {}
+	void draw(mat4 viewProjection) override {}
 };

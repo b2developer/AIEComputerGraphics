@@ -6,9 +6,6 @@
 
 using namespace glm;
 
-//forward declaration
-class Transform;
-
 /*
 * class Camera
 * child class of Component
@@ -85,7 +82,8 @@ public:
 	*
 	* called once per frame after the update loop
 	*
+	* @param mat4 viewProjection - the camera matrix
 	* @returns void
 	*/
-	void draw() override {}
+	void draw(mat4 viewProjection) override {}
 };

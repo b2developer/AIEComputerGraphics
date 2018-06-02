@@ -22,11 +22,11 @@ void Scene::update(float deltaTime)
 }
 
 //main render loop
-void Scene::draw()
+void Scene::draw(mat4 viewProjectionMatrix)
 {
 	//iterate through all gameObjects, drawing each
 	for (vector<GameObject*>::iterator iter = gameObjects.begin(); iter != gameObjects.end(); iter++)
 	{
-		(*iter)->draw();
+		(*iter)->draw(viewProjectionMatrix);
 	}
 }

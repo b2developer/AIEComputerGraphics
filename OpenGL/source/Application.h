@@ -2,8 +2,11 @@
 
 #include <gl_core_4_4.h>
 #include <GLFW/glfw3.h>
+#include <string>
 
 #include "Gizmos.h"
+
+#include "Shader.h"
 
 #include "Scene.h"
 #include "GameObject.h"
@@ -31,6 +34,11 @@ public:
 
 	//window of the application
 	GLFWwindow * window;
+
+	std::string rootFolder;
+
+	//pipeline for the shaders
+	ShaderProgram shaderPipe;
 
 	Scene* scene;
 	GameObject* cameraObject;

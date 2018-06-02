@@ -3,9 +3,10 @@
 
 #define INP Input::getInstance()
 
-const int MAX_KEY_SIZE = 256;
+const int MAX_KEY_SIZE = 400;
+const int MAX_MOUSE_BUTTON_SIZE = 8;
 
-enum EKeyInput
+enum EButtonInput
 {
 	RELEASE,
 	PRESS,
@@ -53,7 +54,12 @@ public:
 	double mouseMovementX = 0.0;
 	double mouseMovementY = 0.0;
 
-	EKeyInput keyStates[MAX_KEY_SIZE];
+	EButtonInput keyStates[MAX_KEY_SIZE];
+	EButtonInput prevKeyStates[MAX_KEY_SIZE];
+
+	EButtonInput buttonStates[MAX_MOUSE_BUTTON_SIZE];
+	EButtonInput prevButtonStates[MAX_MOUSE_BUTTON_SIZE];
+
 	ECursorLock cursorMode = ECursorLock::NONE;
 
 	/*

@@ -1,6 +1,9 @@
 #pragma once
 #include <vector>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
+using namespace glm;
 using namespace std;
 
 //forward declaration
@@ -55,7 +58,8 @@ public:
 	* called once per frame afte the update loop
 	* draws all components
 	*
+	* @param mat4 viewProjection - the camera matrix
 	* @returns void
 	*/
-	void draw();
+	void draw(mat4 viewProjectionMatrix);
 };

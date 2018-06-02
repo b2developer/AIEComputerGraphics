@@ -1,4 +1,8 @@
 #pragma once
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
+using namespace glm;
 
 //forward declaration
 class GameObject;
@@ -56,7 +60,8 @@ public:
 	*
 	* called once per frame after the update loop
 	*
+	* @param mat4 viewProjection - the camera matrix
 	* @returns void
 	*/
-	virtual void draw() {}
+	virtual void draw(mat4 viewProjection) {}
 };
