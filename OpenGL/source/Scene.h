@@ -3,8 +3,11 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "Shader.h"
+
 using namespace glm;
 using namespace std;
+using namespace aie;
 
 //forward declaration
 class GameObject;
@@ -21,6 +24,11 @@ class GameObject;
 class Scene
 {
 public:
+
+	float time = 0.0f;
+
+	//pointer to the shader rendering the scene
+	ShaderProgram * shaderPipe;
 
 	//list of gameObjects in the scene
 	vector<GameObject*> gameObjects;
@@ -51,11 +59,11 @@ public:
 	/*
 	* draw
 	*
-	* called once per frame afte the update loop
+	* called once per frame after the update loop
 	* draws all gameObjects
 	*
-	* @param mat4 viewProjection - the camera matrix
+	* @param GameObject* camera - pointer to the camera
 	* @returns void
 	*/
-	void draw(mat4 viewProjection);
+	void draw(GameObject* camera);
 };

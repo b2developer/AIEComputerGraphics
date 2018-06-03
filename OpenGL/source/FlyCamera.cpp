@@ -7,7 +7,8 @@
 //main update loop
 void FlyCamera::update(float deltaTime)
 {
-	float DEG2RAD = 180.0f / glm::pi<float>();
+	float PI = glm::pi<float>();
+	float DEG2RAD = 180.0f / PI;
 
 	vec3 input = vec3(0, 0, 0);
 
@@ -19,6 +20,8 @@ void FlyCamera::update(float deltaTime)
 		float dmy = (float)INP->mouseMovementY;
 
 		rotationAngles += vec2(-dmx, dmy) * deltaTime * sensitivity / DEG2RAD;
+		
+		rotationAngles.y = glm::clamp(rotationAngles.y, -PI / 2.0f + 0.001f, PI / 2.0f - 0.001f);
 
 		float xsn = sinf(rotationAngles.x);
 		float xcs = cosf(rotationAngles.x);

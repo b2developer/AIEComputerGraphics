@@ -86,8 +86,8 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	//initialise gizmos
 	Gizmos::create(10000, 10000, 10000, 10000);
 
-	shaderPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/simple.vert").c_str());
-	shaderPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/simple.frag").c_str());
+	shaderPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/normalmapping.vert").c_str());
+	shaderPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/normalmapping.frag").c_str());
 
 	//check the shader binded properly
 	if (shaderPipe.link() == false)
@@ -96,7 +96,8 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	}
 
 	scene = new Scene();
-	
+	scene->shaderPipe = &shaderPipe;
+
 	//------------------------------------------------------------------------------
 	cameraObject = new GameObject();
 
@@ -154,9 +155,53 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	mesh2->start();
 	//------------------------------------------------------------------------------
 
+	//------------------------------------------------------------------------------
+	texture = new Texture();
+
+	//texture failed to load
+	if (texture->load(std::string(rootFolder + "\\textures\\profile.png").c_str()) == false)
+	{
+		return false;
+	}
+	
+	GameObject* quadObject = new GameObject();
+
+	quadObject->transform->position = vec3(0, 0, 0);
+	quadObject->transform->scale = vec3(3, 1, 3);
+	quadObject->transform->onTransformUpdate();
+
+	Mesh* rawMesh = new Mesh(&shaderPipe, texture);
+	rawMesh->gameObject = quadObject;
+	quadObject->components.push_back(rawMesh);
+	rawMesh->start();
+	//------------------------------------------------------------------------------
+
+	//------------------------------------------------------------------------------
+	GameObject* meshObject3 = new GameObject();
+
+	meshObject3->transform->position = vec3(0, 5, 10);
+	meshObject3->transform->onTransformUpdate();
+
+	OBJMesh* mesh3 = new OBJMesh(&shaderPipe);
+
+	mesh3->useTexture = 1;
+
+	//mesh failed to load
+	if (mesh3->load(std::string(rootFolder + "/models/soulspear.obj").c_str(), true, true) == false)
+	{
+		return false;
+	}
+
+	mesh3->gameObject = meshObject3;
+	meshObject3->components.push_back(mesh3);
+	mesh3->start();
+	//------------------------------------------------------------------------------
+
 	scene->gameObjects.push_back(cameraObject);
 	scene->gameObjects.push_back(meshObject);
 	scene->gameObjects.push_back(meshObject2);
+	scene->gameObjects.push_back(meshObject3);
+	//scene->gameObjects.push_back(quadObject);
 
 	INP->setCursorLockMode(ECursorLock::NONE);
 
@@ -170,6 +215,8 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 void Application::shutdown()
 {
 	delete scene;
+
+	delete texture;
 
 	//destroy the window
 	glfwDestroyWindow(window);
@@ -196,7 +243,7 @@ bool Application::update()
 		//Game Logic
 		//-------------------
 		scene->update((float)deltaTime);
-		//-------------------
+		//------------------
 
 		draw();
 
@@ -221,14 +268,12 @@ void Application::draw()
 	glClearColor(0.25f, 0.25f, 0.25f, 1); //fills the screen with a solid colour
 	glEnable(GL_DEPTH_TEST); //enables the depth buffer to be used this render call
 
-	Camera* c = (Camera*)cameraObject->components[1];
-
-	scene->draw(c->projectionMatrix * c->gameObject->transform->translationMatrix);
-
 	Gizmos::clear(); //removes all existing gizmos
 
 	vec4 white(1);
 	vec4 black(0, 0, 0, 1);
+
+	scene->draw(cameraObject);
 
 	//Gizmos::addAABBFilled(vec3(2, 2, 0), vec3(2, 2, 2), vec4(1, 0, 0, 1));
 
@@ -237,6 +282,10 @@ void Application::draw()
 		Gizmos::addLine(vec3(-10 + i, 0, 10), vec3(-10 + i, 0, -10), i == 10 ? white : black);
 		Gizmos::addLine(vec3(10, 0, -10 + i), vec3(-10, 0, -10 + i), i == 10 ? white : black);
 	}
+
+	Camera* c = (Camera*)cameraObject->components[1];
+
+	mat4 viewProjectionMatrix = c->projectionMatrix * c->gameObject->transform->translationMatrix;
 
 	Gizmos::draw(c->projectionMatrix * c->gameObject->transform->translationMatrix);
 }

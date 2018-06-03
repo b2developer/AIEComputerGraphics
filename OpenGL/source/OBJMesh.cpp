@@ -163,9 +163,19 @@ void OBJMesh::draw(mat4 viewProjection)
 {
 	shaderPipe->bind();
 
+	shaderPipe->bindUniform("useTexture", useTexture);
+
 	//create the view matrix
 	auto pvm = viewProjection * gameObject->transform->translationMatrix;
 	shaderPipe->bindUniform("ProjectionViewModel", pvm);
+
+	//create the model matrix
+	auto vm = gameObject->transform->translationMatrix;
+	shaderPipe->bindUniform("ModelMatrix", vm);
+
+	//create the normal matrix (rotation matrix of the model)
+	mat3 nm = glm::lookAt(vec3(0,0,0), gameObject->transform->forward, vec3(0,1,0));
+	shaderPipe->bindUniform("NormalMatrix", nm);
 
 	bool usePatches = false;
 

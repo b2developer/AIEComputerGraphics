@@ -21,6 +21,8 @@ public:
 	//pointer to the GPU bound code to render the mesh
 	ShaderProgram * shaderPipe;
 
+	int useTexture = false;
+
 	// a vertex structure for obj files
 	struct Vertex 
 	{

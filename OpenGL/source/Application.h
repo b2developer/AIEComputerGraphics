@@ -11,6 +11,8 @@
 #include "Scene.h"
 #include "GameObject.h"
 
+#include "Texture.h"
+
 using namespace glm;
 using namespace aie;
 
@@ -42,6 +44,8 @@ public:
 
 	Scene* scene;
 	GameObject* cameraObject;
+
+	Texture* texture;
 
 	/*
 	* Application()

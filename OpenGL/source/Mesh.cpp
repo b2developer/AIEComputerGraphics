@@ -6,14 +6,24 @@
 #include <GLFW/glfw3.h>
 
 //constructor
-Mesh::Mesh(ShaderProgram * inShaderPipe)
+Mesh::Mesh(ShaderProgram * inShaderPipe, Texture * inTexture)
 {
+
+	kD = new float[4];
+	kD[0] = 1.0f;
+	kD[1] = 0.0f;
+	kD[2] = 1.0f;
+	kD[3] = 1.0f;
+
 	shaderPipe = inShaderPipe;
+	texture = inTexture;
 }
 
 //destructor
 Mesh::~Mesh()
 {
+	delete kD;
+
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
 	glDeleteBuffers(1, &ibo);
@@ -52,12 +62,24 @@ void Mesh::initialiseQuad()
 	vertices[4].position = { 0.5f, 0, 0.5f, 1 };
 	vertices[5].position = { 0.5f, 0, -0.5f, 1 };
 
+	vertices[0].texCoord = { 0, 1 };
+	vertices[1].texCoord = { 1, 1 };
+	vertices[2].texCoord = { 0, 0 };
+
+	vertices[3].texCoord = { 0, 0 };
+	vertices[4].texCoord = { 1, 1 };
+	vertices[5].texCoord = { 1, 0 };
+
 	//fill the vertex buffer
 	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(Vertex), vertices, GL_STATIC_DRAW);
 
 	//define the first element as the position
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+
+	//define the third element as texture coords
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)32);
 
 	//unbind buffers, as a safety measure
 	//this allows the vertex arrays to be bound again
@@ -89,6 +111,10 @@ void Mesh::initialise(unsigned int vertexCount, const Vertex * vertices, unsigne
 	//define the first element as the position
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+
+	//define the third element as texture coords
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)32);
 
 	//bind indices if there are any to bind
 	if (indexCount != 0)
@@ -124,6 +150,11 @@ void Mesh::draw(mat4 viewProjection)
 	//create the view matrix
 	auto pvm = viewProjection * gameObject->transform->translationMatrix;
 	shaderPipe->bindUniform("ProjectionViewModel", pvm);
+
+	shaderPipe->bindUniform("Kd", vec3(1, 1, 1));
+
+	shaderPipe->bindUniform("diffuseTexture", 0);
+	texture->bind(0);
 
 	glBindVertexArray(vao);
 
