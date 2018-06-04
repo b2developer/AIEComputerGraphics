@@ -158,8 +158,10 @@
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Mesh.cpp" />
     <ClCompile Include="source\OBJMesh.cpp" />
+    <ClCompile Include="source\RenderTarget.cpp" />
     <ClCompile Include="source\Scene.cpp" />
     <ClCompile Include="source\Shader.cpp" />
+    <ClCompile Include="source\ShaderLibrary.cpp" />
     <ClCompile Include="source\Texture.cpp" />
     <ClCompile Include="source\Transform.cpp" />
   </ItemGroup>
@@ -175,8 +177,11 @@
     <ClInclude Include="source\InputCallbacks.h" />
     <ClInclude Include="source\Mesh.h" />
     <ClInclude Include="source\OBJMesh.h" />
+    <ClInclude Include="source\RenderTarget.h" />
+    <ClInclude Include="source\RenderType.h" />
     <ClInclude Include="source\Scene.h" />
     <ClInclude Include="source\Shader.h" />
+    <ClInclude Include="source\ShaderLibrary.h" />
     <ClInclude Include="source\Texture.h" />
     <ClInclude Include="source\tiny_obj_loader.h" />
     <ClInclude Include="source\Transform.h" />

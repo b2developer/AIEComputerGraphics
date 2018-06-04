@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "RenderType.h"
+
 using namespace glm;
 using namespace std;
 
@@ -61,5 +63,5 @@ public:
 	* @param mat4 viewProjection - the camera matrix
 	* @returns void
 	*/
-	void draw(mat4 viewProjectionMatrix);
+	void draw(mat4 viewProjectionMatrix, ERenderType renderType);
 };

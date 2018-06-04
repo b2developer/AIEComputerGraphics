@@ -7,6 +7,7 @@
 #include "Gizmos.h"
 
 #include "Shader.h"
+#include "RenderTarget.h"
 
 #include "Scene.h"
 #include "GameObject.h"
@@ -40,12 +41,16 @@ public:
 	std::string rootFolder;
 
 	//pipeline for the shaders
-	ShaderProgram shaderPipe;
+	ShaderProgram simplePipe;
+	ShaderProgram normalPipe;
 
 	Scene* scene;
 	GameObject* cameraObject;
 
 	Texture* texture;
+	Texture* texture2;
+
+	RenderTarget renderTarget;
 
 	/*
 	* Application()
@@ -91,6 +96,17 @@ public:
 	* @returns bool - result of the update, false indicates shutdown
 	*/
 	bool update();
+
+	/*
+	* clearScreen
+	*
+	* tells OpenGL to clear the colour and depth buffers
+	* and fills the screen with a solid colour
+	*
+	* @param vec4 colour - the colour to fill the screen with
+	* @returns void
+	*/
+	void clearScreen(vec4 colour);
 
 	/*
 	* draw

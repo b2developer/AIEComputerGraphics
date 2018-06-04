@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "RenderType.h"
+
 using namespace glm;
 
 /*
@@ -83,7 +85,8 @@ public:
 	* called once per frame after the update loop
 	*
 	* @param mat4 viewProjection - the camera matrix
+	* @param ERenderType renderType - the type of pass to perform on the fragment shader
 	* @returns void
 	*/
-	void draw(mat4 viewProjection) override {}
+	void draw(mat4 viewProjection, ERenderType renderType) override {}
 };

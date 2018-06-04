@@ -1,6 +1,5 @@
 #pragma once
 #include "Component.h"
-#include "Shader.h"
 #include "Texture.h"
 
 #include <glm/glm.hpp>
@@ -27,9 +26,6 @@ public:
 
 	Texture * texture;
 
-	//pointer to the GPU bound code to render the mesh
-	ShaderProgram * shaderPipe;
-
 	//amount of triangles in the mesh
 	unsigned int triCount = 0;
 
@@ -50,10 +46,9 @@ public:
 	* Mesh()
 	* constructor, assigns the shaders to bind
 	*
-	* @param ShaderProgram* inShaderPipe - the shader pipeline to bound data to
 	* @param Texture* inTexture - the texture to bind to the shader
 	*/
-	Mesh(ShaderProgram* inShaderPipe, Texture* inTexture);
+	Mesh(Texture* inTexture);
 
 	/*
 	* ~Mesh()
@@ -112,7 +107,8 @@ public:
 	* called once per frame after the update loop
 	*
 	* @param mat4 viewProjection - the camera matrix
+	* @param ERenderType renderType - the type of pass to perform on the fragment shader
 	* @returns void
 	*/
-	void draw(mat4 viewProjection) override;
+	void draw(mat4 viewProjection, ERenderType renderType) override;
 };

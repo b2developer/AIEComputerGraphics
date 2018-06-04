@@ -5,11 +5,13 @@
 
 #include "Shader.h"
 
+#include "RenderType.h"
+
 using namespace glm;
 using namespace std;
 using namespace aie;
 
-//forward declaration
+//forward declarations
 class GameObject;
 
 /*
@@ -63,7 +65,8 @@ public:
 	* draws all gameObjects
 	*
 	* @param GameObject* camera - pointer to the camera
+	* @param ERenderType renderType - the type of pass to perform on the fragment shader
 	* @returns void
 	*/
-	void draw(GameObject* camera);
+	void draw(GameObject* camera, ERenderType renderType);
 };

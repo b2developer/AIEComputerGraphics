@@ -3,6 +3,8 @@
 #include "Transform.h"
 #include "Camera.h"
 
+#include "ShaderLibrary.h"
+
 //destructor
 Scene::~Scene()
 {
@@ -26,7 +28,7 @@ void Scene::update(float deltaTime)
 }
 
 //main render loop
-void Scene::draw(GameObject* camera)
+void Scene::draw(GameObject* camera, ERenderType renderType)
 {
 	Camera* c = (Camera*)camera->components[1];
 
@@ -34,7 +36,7 @@ void Scene::draw(GameObject* camera)
 
 	shaderPipe->bind();
 
-	vec3 lightDirection = vec3(cosf(time * 2.0), -1, sinf(time * 2.0));
+	vec3 lightDirection = vec3(cosf(time * 2.0f), -1, sinf(time * 2.0f));
 
 	shaderPipe->bindUniform("lightDirection", lightDirection);
 	shaderPipe->bindUniform("cameraPosition", camera->transform->position);
@@ -46,6 +48,6 @@ void Scene::draw(GameObject* camera)
 	//iterate through all gameObjects, drawing each
 	for (vector<GameObject*>::iterator iter = gameObjects.begin(); iter != gameObjects.end(); iter++)
 	{
-		(*iter)->draw(viewProjectionMatrix);
+		(*iter)->draw(viewProjectionMatrix, renderType);
 	}
 }

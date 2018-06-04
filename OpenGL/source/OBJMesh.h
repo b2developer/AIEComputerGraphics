@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
-
-#include "Shader.h"
 #include "Texture.h"
+
+#include "RenderType.h"
 
 namespace aie {
 
@@ -17,9 +17,6 @@ namespace aie {
 class OBJMesh : public Component
 {
 public:
-
-	//pointer to the GPU bound code to render the mesh
-	ShaderProgram * shaderPipe;
 
 	int useTexture = false;
 
@@ -59,7 +56,7 @@ public:
 		Texture displacementTexture;		// bound slot 6
 	};
 
-	OBJMesh(ShaderProgram* inShaderPipe);
+	OBJMesh();
 	~OBJMesh();
 
 	/*
@@ -87,7 +84,7 @@ public:
 	bool load(const char* filename, bool loadTextures = true, bool flipTextureV = false);
 
 	// allow option to draw as patches for tessellation
-	void draw(mat4 viewProjection) override;
+	void draw(mat4 viewProjection, ERenderType renderType) override;
 
 	// access to the filename that was loaded
 	const std::string& getFilename() const { return m_filename; }

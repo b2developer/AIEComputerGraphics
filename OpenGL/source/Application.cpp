@@ -9,6 +9,7 @@
 #include <glm/ext.hpp>
 
 #include "InputCallbacks.h"
+#include "ShaderLibrary.h"
 #include "Transform.h"
 #include "Camera.h"
 #include "FlyCamera.h"
@@ -30,6 +31,9 @@ Application::~Application()
 //runs when the update function will start looping
 bool Application::startup(unsigned int width, unsigned int height, const char windowName[MAX_NAME])
 {
+	std::cout.precision(2);
+	std::cout.setf(std::ios::fixed);
+
 	//window system initialisation
 	if (glfwInit() == false)
 	{
@@ -86,17 +90,46 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	//initialise gizmos
 	Gizmos::create(10000, 10000, 10000, 10000);
 
-	shaderPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/normalmapping.vert").c_str());
-	shaderPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/normalmapping.frag").c_str());
+	simplePipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/simple.vert").c_str());
+	simplePipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/simple.frag").c_str());
+
+	normalPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/normalmapping.vert").c_str());
+	normalPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/normalmapping.frag").c_str());
+
+	//load essential shaders for lighting
+	//------------------------------------------------------------------------------
+	SHL->albedoPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/standard.vert").c_str());
+	SHL->albedoPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/albedo.frag").c_str());
+
+	SHL->positionPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/standard.vert").c_str());
+	SHL->positionPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/position.frag").c_str());
+
+	SHL->normalPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/standard.vert").c_str());
+	SHL->normalPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/normal.frag").c_str());
+
+	SHL->linkShaders();
+	//------------------------------------------------------------------------------
 
 	//check the shader binded properly
-	if (shaderPipe.link() == false)
+	if (simplePipe.link() == false)
 	{
-		cout << "Shader Error: " << '\n' << shaderPipe.getLastError() << '\n';
+		cout << "Shader Error (Simple Shader): " << '\n' << simplePipe.getLastError() << '\n';
+	}
+
+	//check the shader binded properly
+	if (normalPipe.link() == false)
+	{
+		cout << "Shader Error (Normal Map Shader): " << '\n' << normalPipe.getLastError() << '\n';
+	}
+
+	//check render target initialised properly
+	if (renderTarget.initialise(1, width, height) == false)
+	{
+		return false;
 	}
 
 	scene = new Scene();
-	scene->shaderPipe = &shaderPipe;
+	scene->shaderPipe = &normalPipe;
 
 	//------------------------------------------------------------------------------
 	cameraObject = new GameObject();
@@ -123,7 +156,7 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	meshObject->transform->position = vec3(10, 5, 0);
 	meshObject->transform->onTransformUpdate();
 
-	OBJMesh* mesh = new OBJMesh(&shaderPipe);
+	OBJMesh* mesh = new OBJMesh();
 
 	//mesh failed to load
 	if (mesh->load(std::string(rootFolder + "/models/Bunny.obj").c_str()) == false)
@@ -142,7 +175,7 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	meshObject2->transform->position = vec3(-10, 5, 0);
 	meshObject2->transform->onTransformUpdate();
 
-	OBJMesh* mesh2 = new OBJMesh(&shaderPipe);
+	OBJMesh* mesh2 = new OBJMesh();
 
 	//mesh failed to load
 	if (mesh2->load(std::string(rootFolder + "/models/Dragon.obj").c_str()) == false)
@@ -170,9 +203,30 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	quadObject->transform->scale = vec3(3, 1, 3);
 	quadObject->transform->onTransformUpdate();
 
-	Mesh* rawMesh = new Mesh(&shaderPipe, texture);
+	Mesh* rawMesh = new Mesh(&renderTarget.m_targets[0]);
 	rawMesh->gameObject = quadObject;
 	quadObject->components.push_back(rawMesh);
+	rawMesh->start();
+	//------------------------------------------------------------------------------
+
+	//------------------------------------------------------------------------------
+	texture2 = new Texture();
+
+	//texture failed to load
+	if (texture2->load(std::string(rootFolder + "\\textures\\profile2.png").c_str()) == false)
+	{
+		return false;
+	}
+
+	GameObject* quadObject2 = new GameObject();
+
+	quadObject2->transform->position = vec3(0, 0, -3);
+	quadObject2->transform->scale = vec3(3, 1, 3);
+	quadObject2->transform->onTransformUpdate();
+
+	rawMesh = new Mesh(texture2);
+	rawMesh->gameObject = quadObject2;
+	quadObject2->components.push_back(rawMesh);
 	rawMesh->start();
 	//------------------------------------------------------------------------------
 
@@ -182,7 +236,7 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	meshObject3->transform->position = vec3(0, 5, 10);
 	meshObject3->transform->onTransformUpdate();
 
-	OBJMesh* mesh3 = new OBJMesh(&shaderPipe);
+	OBJMesh* mesh3 = new OBJMesh();
 
 	mesh3->useTexture = 1;
 
@@ -201,12 +255,10 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	scene->gameObjects.push_back(meshObject);
 	scene->gameObjects.push_back(meshObject2);
 	scene->gameObjects.push_back(meshObject3);
-	//scene->gameObjects.push_back(quadObject);
+	scene->gameObjects.push_back(quadObject);
+	scene->gameObjects.push_back(quadObject2);
 
 	INP->setCursorLockMode(ECursorLock::NONE);
-
-	std::cout.precision(2);
-	std::cout.setf(std::ios::fixed);
 
 	return true;
 }
@@ -217,6 +269,7 @@ void Application::shutdown()
 	delete scene;
 
 	delete texture;
+	delete texture2;
 
 	//destroy the window
 	glfwDestroyWindow(window);
@@ -261,24 +314,37 @@ bool Application::update()
 	return true;
 }
 
+//clears the screen and fills it with a solid colour
+void Application::clearScreen(vec4 colour)
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the screen and depth buffers
+	glClearColor(colour.x, colour.y, colour.z, colour.w); //fills the screen with a solid colour
+	glEnable(GL_DEPTH_TEST); //enables the depth buffer to be used this render call
+}
+
 //render function, runs after the update
 void Application::draw()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the screen and depth buffers
-	glClearColor(0.25f, 0.25f, 0.25f, 1); //fills the screen with a solid colour
-	glEnable(GL_DEPTH_TEST); //enables the depth buffer to be used this render call
+	renderTarget.bind();
+
+	clearScreen(vec4(0.25f, 0.25f, 0.25f, 1.0f));
+
+	scene->draw(cameraObject, ERenderType::POSITION_PASS);
+	renderTarget.unbind();
+
+	clearScreen(vec4(0.25f, 0.25f, 0.25f, 1.0f));
+
+	scene->draw(cameraObject, ERenderType::ALBEDO_PASS);
+
+	//scene->draw(cameraObject, ERenderType::NORMAL_PASS);
 
 	Gizmos::clear(); //removes all existing gizmos
 
 	vec4 white(1);
 	vec4 black(0, 0, 0, 1);
 
-	scene->draw(cameraObject);
-
-	//Gizmos::addAABBFilled(vec3(2, 2, 0), vec3(2, 2, 2), vec4(1, 0, 0, 1));
-
-	for (int i = 0; i < 21; ++i) {
-
+	for (int i = 0; i < 21; ++i) 
+	{
 		Gizmos::addLine(vec3(-10 + i, 0, 10), vec3(-10 + i, 0, -10), i == 10 ? white : black);
 		Gizmos::addLine(vec3(10, 0, -10 + i), vec3(-10, 0, -10 + i), i == 10 ? white : black);
 	}

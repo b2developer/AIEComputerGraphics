@@ -8,11 +8,15 @@
 #include "GameObject.h"
 #include "Transform.h"
 
+#include "ShaderLibrary.h"
+
 namespace aie {
-	OBJMesh::OBJMesh(ShaderProgram * inShaderPipe)
+
+	OBJMesh::OBJMesh()
 	{
-		shaderPipe = inShaderPipe;
+	
 	}
+
 	OBJMesh::~OBJMesh() {
 	for (auto& c : m_meshChunks) {
 		glDeleteVertexArrays(1, &c.vao);
@@ -159,23 +163,42 @@ bool OBJMesh::load(const char* filename, bool loadTextures /* = true */, bool fl
 	return true;
 }
 
-void OBJMesh::draw(mat4 viewProjection) 
+void OBJMesh::draw(mat4 viewProjection, ERenderType renderType) 
 {
-	shaderPipe->bind();
+	//albedo pass
+	if (renderType == ERenderType::ALBEDO_PASS)
+	{
+		SHL->albedoPipe.bind();
 
-	shaderPipe->bindUniform("useTexture", useTexture);
+		SHL->albedoPipe.bindUniform("useTexture", useTexture);
 
-	//create the view matrix
-	auto pvm = viewProjection * gameObject->transform->translationMatrix;
-	shaderPipe->bindUniform("ProjectionViewModel", pvm);
+		//create the view matrix
+		auto pvm = viewProjection * gameObject->transform->translationMatrix;
+		SHL->albedoPipe.bindUniform("ProjectionViewModel", pvm);
+	}
+	else if (renderType == ERenderType::POSITION_PASS) 
+	{
+		SHL->positionPipe.bind();
 
-	//create the model matrix
-	auto vm = gameObject->transform->translationMatrix;
-	shaderPipe->bindUniform("ModelMatrix", vm);
+		//create the view matrix
+		auto pvm = viewProjection * gameObject->transform->translationMatrix;
+		SHL->positionPipe.bindUniform("ProjectionViewModel", pvm);
+		SHL->positionPipe.bindUniform("ModelMatrix", gameObject->transform->translationMatrix);
+	}
+	else if (renderType == ERenderType::NORMAL_PASS)
+	{
+		SHL->normalPipe.bind();
 
-	//create the normal matrix (rotation matrix of the model)
-	mat3 nm = glm::lookAt(vec3(0,0,0), gameObject->transform->forward, vec3(0,1,0));
-	shaderPipe->bindUniform("NormalMatrix", nm);
+		SHL->normalPipe.bindUniform("useTexture", useTexture);
+
+		//create the view matrix
+		auto pvm = viewProjection * gameObject->transform->translationMatrix;
+		SHL->normalPipe.bindUniform("ProjectionViewModel", pvm);
+
+		//create the normal matrix (rotation matrix of the model)
+		mat3 nm = glm::lookAt(vec3(0, 0, 0), gameObject->transform->forward, vec3(0, 1, 0));
+		SHL->normalPipe.bindUniform("NormalMatrix", nm);
+	}
 
 	bool usePatches = false;
 
