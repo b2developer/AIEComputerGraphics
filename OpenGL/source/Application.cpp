@@ -203,7 +203,7 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	quadObject->transform->scale = vec3(3, 1, 3);
 	quadObject->transform->onTransformUpdate();
 
-	Mesh* rawMesh = new Mesh(&renderTarget.m_targets[0]);
+	Mesh* rawMesh = new Mesh(texture);
 	rawMesh->gameObject = quadObject;
 	quadObject->components.push_back(rawMesh);
 	rawMesh->start();
@@ -325,17 +325,12 @@ void Application::clearScreen(vec4 colour)
 //render function, runs after the update
 void Application::draw()
 {
-	renderTarget.bind();
-
-	clearScreen(vec4(0.25f, 0.25f, 0.25f, 1.0f));
-
-	scene->draw(cameraObject, ERenderType::POSITION_PASS);
-	renderTarget.unbind();
 
 	clearScreen(vec4(0.25f, 0.25f, 0.25f, 1.0f));
 
 	scene->draw(cameraObject, ERenderType::ALBEDO_PASS);
 
+	//scene->draw(cameraObject, ERenderType::POSITION_PASS);
 	//scene->draw(cameraObject, ERenderType::NORMAL_PASS);
 
 	Gizmos::clear(); //removes all existing gizmos
