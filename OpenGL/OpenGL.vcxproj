@@ -158,6 +158,7 @@
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Mesh.cpp" />
     <ClCompile Include="source\OBJMesh.cpp" />
+    <ClCompile Include="source\RenderMesh.cpp" />
     <ClCompile Include="source\RenderTarget.cpp" />
     <ClCompile Include="source\Scene.cpp" />
     <ClCompile Include="source\Shader.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="source\InputCallbacks.h" />
     <ClInclude Include="source\Mesh.h" />
     <ClInclude Include="source\OBJMesh.h" />
+    <ClInclude Include="source\RenderMesh.h" />
     <ClInclude Include="source\RenderTarget.h" />
     <ClInclude Include="source\RenderType.h" />
     <ClInclude Include="source\Scene.h" />

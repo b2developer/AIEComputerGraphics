@@ -35,6 +35,9 @@ public:
 	ShaderProgram albedoPipe;
 	ShaderProgram positionPipe;
 	ShaderProgram normalPipe;
+	ShaderProgram postProcessingPipe;
+	ShaderProgram gPassPipe;
+	ShaderProgram lPassPipe;
 
 	/*
 	* getInstance

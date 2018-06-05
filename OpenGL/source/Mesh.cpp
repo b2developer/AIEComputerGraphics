@@ -146,6 +146,12 @@ void Mesh::initialise(unsigned int vertexCount, const Vertex * vertices, unsigne
 //main render loop
 void Mesh::draw(mat4 viewProjection, ERenderType renderType)
 {
+	//incorrect pass
+	if (renderType == ERenderType::LIGHTING_PASS || renderType == ERenderType::POST_PROCESSING_PASS)
+	{
+		return;
+	}
+
 	//albedo pass
 	if (renderType == ERenderType::ALBEDO_PASS)
 	{
@@ -185,6 +191,28 @@ void Mesh::draw(mat4 viewProjection, ERenderType renderType)
 		//create the normal matrix (rotation matrix of the model)
 		mat3 nm = glm::lookAt(vec3(0, 0, 0), gameObject->transform->forward, vec3(0, 1, 0));
 		SHL->normalPipe.bindUniform("NormalMatrix", nm);
+	}
+	else if (renderType == ERenderType::G_PASS)
+	{
+		SHL->gPassPipe.bind();
+
+		SHL->gPassPipe.bindUniform("useTexture", 1);
+		SHL->gPassPipe.bindUniform("useNormalTexture", 0);
+
+		//create all neccessary matrice
+		auto pvm = viewProjection * gameObject->transform->translationMatrix;
+
+		SHL->gPassPipe.bindUniform("ProjectionViewModel", pvm);
+		SHL->gPassPipe.bindUniform("ModelMatrix", gameObject->transform->translationMatrix);
+
+		//create the normal matrix (rotation matrix of the model)
+		mat3 nm = glm::lookAt(vec3(0, 0, 0), gameObject->transform->forward, vec3(0, 1, 0));
+		SHL->gPassPipe.bindUniform("NormalMatrix", nm);
+
+		SHL->gPassPipe.bindUniform("Kd", vec3(1, 1, 1));
+		SHL->gPassPipe.bindUniform("diffuseTexture", 0);
+
+		texture->bind(0);
 	}
 
 	glBindVertexArray(vao);

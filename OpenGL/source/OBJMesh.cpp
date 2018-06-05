@@ -165,6 +165,12 @@ bool OBJMesh::load(const char* filename, bool loadTextures /* = true */, bool fl
 
 void OBJMesh::draw(mat4 viewProjection, ERenderType renderType) 
 {
+	//incorrect pass
+	if (renderType == ERenderType::LIGHTING_PASS || renderType == ERenderType::POST_PROCESSING_PASS)
+	{
+		return;
+	}
+
 	//albedo pass
 	if (renderType == ERenderType::ALBEDO_PASS)
 	{
@@ -198,6 +204,23 @@ void OBJMesh::draw(mat4 viewProjection, ERenderType renderType)
 		//create the normal matrix (rotation matrix of the model)
 		mat3 nm = glm::lookAt(vec3(0, 0, 0), gameObject->transform->forward, vec3(0, 1, 0));
 		SHL->normalPipe.bindUniform("NormalMatrix", nm);
+	}
+	else if (renderType == ERenderType::G_PASS)
+	{
+		SHL->gPassPipe.bind();
+
+		SHL->gPassPipe.bindUniform("useTexture", useTexture);
+		SHL->gPassPipe.bindUniform("useNormalTexture", useTexture);
+
+		//create all neccessary matrice
+		auto pvm = viewProjection * gameObject->transform->translationMatrix;
+
+		SHL->gPassPipe.bindUniform("ProjectionViewModel", pvm);
+		SHL->gPassPipe.bindUniform("ModelMatrix", gameObject->transform->translationMatrix);
+
+		//create the normal matrix (rotation matrix of the model)
+		mat3 nm = glm::lookAt(vec3(0, 0, 0), gameObject->transform->forward, vec3(0, 1, 0));
+		SHL->gPassPipe.bindUniform("NormalMatrix", nm);
 	}
 
 	bool usePatches = false;

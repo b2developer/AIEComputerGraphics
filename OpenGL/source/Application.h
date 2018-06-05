@@ -50,7 +50,10 @@ public:
 	Texture* texture;
 	Texture* texture2;
 
-	RenderTarget renderTarget;
+	RenderTarget albedoRender;
+	RenderTarget positionRender;
+	RenderTarget normalRender;
+	RenderTarget postRender;
 
 	/*
 	* Application()

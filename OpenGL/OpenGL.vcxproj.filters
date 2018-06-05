@@ -75,6 +75,9 @@
     <ClCompile Include="source\ShaderLibrary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\RenderMesh.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Gizmos.h">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="source\ShaderLibrary.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RenderMesh.h">
+      <Filter>Header Files\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

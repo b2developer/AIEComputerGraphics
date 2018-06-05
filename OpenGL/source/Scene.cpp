@@ -34,16 +34,12 @@ void Scene::draw(GameObject* camera, ERenderType renderType)
 
 	mat4 viewProjectionMatrix = c->projectionMatrix * c->gameObject->transform->translationMatrix;
 
-	shaderPipe->bind();
+	SHL->lPassPipe.bind();
 
-	vec3 lightDirection = vec3(cosf(time * 2.0f), -1, sinf(time * 2.0f));
+	vec3 lightDirection = vec3(1, -cosf(time * 2.0f), 1);
 
-	shaderPipe->bindUniform("lightDirection", lightDirection);
-	shaderPipe->bindUniform("cameraPosition", camera->transform->position);
-
-	shaderPipe->bindUniform("Ia", vec3(0.25, 0.25, 0.25));
-	shaderPipe->bindUniform("Id", vec3(1, 1, 1));
-	shaderPipe->bindUniform("Is", vec3(1, 1, 1));
+	SHL->lPassPipe.bindUniform("lightDirection", lightDirection);
+	SHL->lPassPipe.bindUniform("lightDiffuse", vec4(1,1,1,1));
 
 	//iterate through all gameObjects, drawing each
 	for (vector<GameObject*>::iterator iter = gameObjects.begin(); iter != gameObjects.end(); iter++)

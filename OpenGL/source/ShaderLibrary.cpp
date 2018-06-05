@@ -32,4 +32,19 @@ void ShaderLibrary::linkShaders()
 	{
 		std::cout << "Shader Error (Normal Shader): " << '\n' << normalPipe.getLastError() << '\n';
 	}
+
+	if (postProcessingPipe.link() == false)
+	{
+		std::cout << "Shader Error (Post-Processing Shader): " << '\n' << postProcessingPipe.getLastError() << '\n';
+	}
+
+	if (gPassPipe.link() == false)
+	{
+		std::cout << "Shader Error (G-Pass Shader): " << '\n' << gPassPipe.getLastError() << '\n';
+	}
+
+	if (lPassPipe.link() == false)
+	{
+		std::cout << "Shader Error (L-Pass Shader): " << '\n' << lPassPipe.getLastError() << '\n';
+	}
 }

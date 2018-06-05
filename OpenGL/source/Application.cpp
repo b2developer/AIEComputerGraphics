@@ -13,8 +13,10 @@
 #include "Transform.h"
 #include "Camera.h"
 #include "FlyCamera.h"
+
 #include "Mesh.h"
 #include "OBJMesh.h"
+#include "RenderMesh.h"
 
 //constructor
 Application::Application()
@@ -107,6 +109,15 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	SHL->normalPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/standard.vert").c_str());
 	SHL->normalPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/normal.frag").c_str());
 
+	SHL->postProcessingPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
+	SHL->postProcessingPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/post.frag").c_str());
+
+	SHL->gPassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/standard.vert").c_str());
+	SHL->gPassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/gpass.frag").c_str());
+
+	SHL->lPassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
+	SHL->lPassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/phong.frag").c_str());
+
 	SHL->linkShaders();
 	//------------------------------------------------------------------------------
 
@@ -123,7 +134,22 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	}
 
 	//check render target initialised properly
-	if (renderTarget.initialise(1, width, height) == false)
+	if (albedoRender.initialise(1, width, height) == false)
+	{
+		return false;
+	}
+
+	if (positionRender.initialise(1, width, height) == false)
+	{
+		return false;
+	}
+
+	if (normalRender.initialise(1, width, height) == false)
+	{
+		return false;
+	}
+
+	if (postRender.initialise(4, width, height) == false)
 	{
 		return false;
 	}
@@ -199,7 +225,7 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	
 	GameObject* quadObject = new GameObject();
 
-	quadObject->transform->position = vec3(0, 0, 0);
+	quadObject->transform->position = vec3(0, -1, 0);
 	quadObject->transform->scale = vec3(3, 1, 3);
 	quadObject->transform->onTransformUpdate();
 
@@ -210,24 +236,43 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	//------------------------------------------------------------------------------
 
 	//------------------------------------------------------------------------------
-	texture2 = new Texture();
+	GameObject* rg1 = new GameObject();
 
-	//texture failed to load
-	if (texture2->load(std::string(rootFolder + "\\textures\\profile2.png").c_str()) == false)
-	{
-		return false;
-	}
+	RenderMesh* rm1 = new RenderMesh(&postRender.m_targets[0], vec2(-1 + 0.333f, -1 + 0.333f), vec2(0.333f, 0.333f), 0.0f, ERenderType::POST_PROCESSING_PASS);
+	rm1->gameObject = rg1;
+	rg1->components.push_back(rm1);
+	rm1->start();
+	//------------------------------------------------------------------------------
 
-	GameObject* quadObject2 = new GameObject();
+	//------------------------------------------------------------------------------
+	GameObject* rg2 = new GameObject();
 
-	quadObject2->transform->position = vec3(0, 0, -3);
-	quadObject2->transform->scale = vec3(3, 1, 3);
-	quadObject2->transform->onTransformUpdate();
+	RenderMesh* rm2 = new RenderMesh(&postRender.m_targets[1], vec2(0.0f, -1 + 0.333f), vec2(0.333f, 0.333f), 0.0f, ERenderType::POST_PROCESSING_PASS);
+	rm2->gameObject = rg2;
+	rg2->components.push_back(rm2);
+	rm2->start();
+	//------------------------------------------------------------------------------
 
-	rawMesh = new Mesh(texture2);
-	rawMesh->gameObject = quadObject2;
-	quadObject2->components.push_back(rawMesh);
-	rawMesh->start();
+	//------------------------------------------------------------------------------
+	GameObject* rg3 = new GameObject();
+
+	RenderMesh* rm3 = new RenderMesh(&postRender.m_targets[2], vec2(1 - 0.333f, -1 + 0.333f), vec2(0.333f, 0.333f), 0.0f, ERenderType::POST_PROCESSING_PASS);
+	rm3->gameObject = rg3;
+	rg3->components.push_back(rm3);
+	rm3->start();
+	//------------------------------------------------------------------------------
+
+	//------------------------------------------------------------------------------
+	GameObject* rg4 = new GameObject();
+
+	RenderMesh* rm4 = new RenderMesh(&postRender.m_targets[3], vec2(0.0f, 0.0f), vec2(1.0f, 1.0f), 0.0f, ERenderType::LIGHTING_PASS);
+
+	rm4->buffer1 = &postRender.m_targets[1];
+	rm4->buffer2 = &postRender.m_targets[2];
+
+	rm4->gameObject = rg4;
+	rg4->components.push_back(rm4);
+	rm4->start();
 	//------------------------------------------------------------------------------
 
 	//------------------------------------------------------------------------------
@@ -256,7 +301,10 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	scene->gameObjects.push_back(meshObject2);
 	scene->gameObjects.push_back(meshObject3);
 	scene->gameObjects.push_back(quadObject);
-	scene->gameObjects.push_back(quadObject2);
+	scene->gameObjects.push_back(rg1);
+	scene->gameObjects.push_back(rg2);
+	scene->gameObjects.push_back(rg3);
+	scene->gameObjects.push_back(rg4);
 
 	INP->setCursorLockMode(ECursorLock::NONE);
 
@@ -328,10 +376,28 @@ void Application::draw()
 
 	clearScreen(vec4(0.25f, 0.25f, 0.25f, 1.0f));
 
+	albedoRender.bind();
+	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	scene->draw(cameraObject, ERenderType::ALBEDO_PASS);
+	albedoRender.unbind();
 
-	//scene->draw(cameraObject, ERenderType::POSITION_PASS);
-	//scene->draw(cameraObject, ERenderType::NORMAL_PASS);
+	positionRender.bind();
+	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	scene->draw(cameraObject, ERenderType::POSITION_PASS);
+	positionRender.unbind();
+
+	normalRender.bind();
+	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	scene->draw(cameraObject, ERenderType::NORMAL_PASS);
+	normalRender.unbind();
+
+	postRender.bind();
+	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	scene->draw(cameraObject, ERenderType::G_PASS);
+	scene->draw(cameraObject, ERenderType::LIGHTING_PASS);
+	postRender.unbind();
+
+	scene->draw(cameraObject, ERenderType::POST_PROCESSING_PASS);
 
 	Gizmos::clear(); //removes all existing gizmos
 
