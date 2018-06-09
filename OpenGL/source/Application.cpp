@@ -92,23 +92,8 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	//initialise gizmos
 	Gizmos::create(10000, 10000, 10000, 10000);
 
-	simplePipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/simple.vert").c_str());
-	simplePipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/simple.frag").c_str());
-
-	normalPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/normalmapping.vert").c_str());
-	normalPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/normalmapping.frag").c_str());
-
 	//load essential shaders for lighting
 	//------------------------------------------------------------------------------
-	SHL->albedoPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/standard.vert").c_str());
-	SHL->albedoPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/albedo.frag").c_str());
-
-	SHL->positionPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/standard.vert").c_str());
-	SHL->positionPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/position.frag").c_str());
-
-	SHL->normalPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/standard.vert").c_str());
-	SHL->normalPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/normal.frag").c_str());
-
 	SHL->postProcessingPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
 	SHL->postProcessingPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/post.frag").c_str());
 
@@ -118,44 +103,31 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	SHL->lPassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
 	SHL->lPassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/phong.frag").c_str());
 
+	SHL->compositePassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
+	SHL->compositePassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/composite.frag").c_str());
+
 	SHL->linkShaders();
 	//------------------------------------------------------------------------------
 
-	//check the shader binded properly
-	if (simplePipe.link() == false)
-	{
-		cout << "Shader Error (Simple Shader): " << '\n' << simplePipe.getLastError() << '\n';
-	}
-
-	//check the shader binded properly
-	if (normalPipe.link() == false)
-	{
-		cout << "Shader Error (Normal Map Shader): " << '\n' << normalPipe.getLastError() << '\n';
-	}
+	Texture::Format formatting[4] = { Texture::Format::RGB8, Texture::Format::RGB32, Texture::Format::RGB32, Texture::Format::RGBA };
 
 	//check render target initialised properly
-	if (albedoRender.initialise(1, width, height) == false)
+	if (postRender.initialise(3, width, height, formatting) == false)
 	{
 		return false;
 	}
 
-	if (positionRender.initialise(1, width, height) == false)
+	if (lightRender.initialise(1, width, height, &formatting[0]) == false)
 	{
 		return false;
 	}
 
-	if (normalRender.initialise(1, width, height) == false)
-	{
-		return false;
-	}
-
-	if (postRender.initialise(4, width, height) == false)
+	if (compRender.initialise(1, width, height, &formatting[3]) == false)
 	{
 		return false;
 	}
 
 	scene = new Scene();
-	scene->shaderPipe = &normalPipe;
 
 	//------------------------------------------------------------------------------
 	cameraObject = new GameObject();
@@ -236,43 +208,29 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	//------------------------------------------------------------------------------
 
 	//------------------------------------------------------------------------------
-	GameObject* rg1 = new GameObject();
+	GameObject* lightGO = new GameObject();
 
-	RenderMesh* rm1 = new RenderMesh(&postRender.m_targets[0], vec2(-1 + 0.333f, -1 + 0.333f), vec2(0.333f, 0.333f), 0.0f, ERenderType::POST_PROCESSING_PASS);
-	rm1->gameObject = rg1;
-	rg1->components.push_back(rm1);
-	rm1->start();
+	RenderMesh* lightRM = new RenderMesh(&lightRender.m_targets[0], vec2(1 - 0.333f, 1 - 0.666f), vec2(0.333f, 0.333f), 0.0f, ERenderType::LIGHTING_PASS);
+
+	lightRM->buffer1 = &postRender.m_targets[1];
+	lightRM->buffer2 = &postRender.m_targets[2];
+
+	lightRM->gameObject = lightGO;
+	lightGO->components.push_back(lightRM);
+	lightRM->start();
 	//------------------------------------------------------------------------------
 
 	//------------------------------------------------------------------------------
-	GameObject* rg2 = new GameObject();
+	GameObject* compGO = new GameObject();
 
-	RenderMesh* rm2 = new RenderMesh(&postRender.m_targets[1], vec2(0.0f, -1 + 0.333f), vec2(0.333f, 0.333f), 0.0f, ERenderType::POST_PROCESSING_PASS);
-	rm2->gameObject = rg2;
-	rg2->components.push_back(rm2);
-	rm2->start();
-	//------------------------------------------------------------------------------
+	RenderMesh* compRM = new RenderMesh(&compRender.m_targets[0], vec2(0.0f, 0.0f), vec2(1.0f, 1.0f), 0.0f, ERenderType::COMPOSITE_PASS);
 
-	//------------------------------------------------------------------------------
-	GameObject* rg3 = new GameObject();
+	compRM->buffer1 = &postRender.m_targets[0];
+	compRM->buffer2 = &lightRender.m_targets[0];
 
-	RenderMesh* rm3 = new RenderMesh(&postRender.m_targets[2], vec2(1 - 0.333f, -1 + 0.333f), vec2(0.333f, 0.333f), 0.0f, ERenderType::POST_PROCESSING_PASS);
-	rm3->gameObject = rg3;
-	rg3->components.push_back(rm3);
-	rm3->start();
-	//------------------------------------------------------------------------------
-
-	//------------------------------------------------------------------------------
-	GameObject* rg4 = new GameObject();
-
-	RenderMesh* rm4 = new RenderMesh(&postRender.m_targets[3], vec2(0.0f, 0.0f), vec2(1.0f, 1.0f), 0.0f, ERenderType::LIGHTING_PASS);
-
-	rm4->buffer1 = &postRender.m_targets[1];
-	rm4->buffer2 = &postRender.m_targets[2];
-
-	rm4->gameObject = rg4;
-	rg4->components.push_back(rm4);
-	rm4->start();
+	compRM->gameObject = compGO;
+	compGO->components.push_back(compRM);
+	compRM->start();
 	//------------------------------------------------------------------------------
 
 	//------------------------------------------------------------------------------
@@ -301,10 +259,9 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	scene->gameObjects.push_back(meshObject2);
 	scene->gameObjects.push_back(meshObject3);
 	scene->gameObjects.push_back(quadObject);
-	scene->gameObjects.push_back(rg1);
-	scene->gameObjects.push_back(rg2);
-	scene->gameObjects.push_back(rg3);
-	scene->gameObjects.push_back(rg4);
+
+	scene->gameObjects.push_back(lightGO);
+	scene->gameObjects.push_back(compGO);
 
 	INP->setCursorLockMode(ECursorLock::NONE);
 
@@ -374,28 +331,22 @@ void Application::clearScreen(vec4 colour)
 void Application::draw()
 {
 
-	clearScreen(vec4(0.25f, 0.25f, 0.25f, 1.0f));
-
-	albedoRender.bind();
 	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	scene->draw(cameraObject, ERenderType::ALBEDO_PASS);
-	albedoRender.unbind();
-
-	positionRender.bind();
-	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	scene->draw(cameraObject, ERenderType::POSITION_PASS);
-	positionRender.unbind();
-
-	normalRender.bind();
-	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	scene->draw(cameraObject, ERenderType::NORMAL_PASS);
-	normalRender.unbind();
 
 	postRender.bind();
 	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	scene->draw(cameraObject, ERenderType::G_PASS);
-	scene->draw(cameraObject, ERenderType::LIGHTING_PASS);
 	postRender.unbind();
+
+	lightRender.bind();
+	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	scene->draw(cameraObject, ERenderType::LIGHTING_PASS);
+	lightRender.unbind();
+
+	compRender.bind();
+	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	scene->draw(cameraObject, ERenderType::COMPOSITE_PASS);
+	compRender.unbind();
 
 	scene->draw(cameraObject, ERenderType::POST_PROCESSING_PASS);
 

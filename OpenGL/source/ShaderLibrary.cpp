@@ -18,21 +18,6 @@ ShaderLibrary * ShaderLibrary::getInstance()
 //error checking for initialisation
 void ShaderLibrary::linkShaders()
 {
-	if (albedoPipe.link() == false)
-	{
-		std::cout << "Shader Error (Simple Shader): " << '\n' << albedoPipe.getLastError() << '\n';
-	}
-
-	if (positionPipe.link() == false)
-	{
-		std::cout << "Shader Error (Position Shader): " << '\n' << positionPipe.getLastError() << '\n';
-	}
-
-	if (normalPipe.link() == false)
-	{
-		std::cout << "Shader Error (Normal Shader): " << '\n' << normalPipe.getLastError() << '\n';
-	}
-
 	if (postProcessingPipe.link() == false)
 	{
 		std::cout << "Shader Error (Post-Processing Shader): " << '\n' << postProcessingPipe.getLastError() << '\n';
@@ -46,5 +31,10 @@ void ShaderLibrary::linkShaders()
 	if (lPassPipe.link() == false)
 	{
 		std::cout << "Shader Error (L-Pass Shader): " << '\n' << lPassPipe.getLastError() << '\n';
+	}
+
+	if (compositePassPipe.link() == false)
+	{
+		std::cout << "Shader Error (Composite Shader): " << '\n' << compositePassPipe.getLastError() << '\n';
 	}
 }

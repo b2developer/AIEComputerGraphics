@@ -36,7 +36,7 @@ void Scene::draw(GameObject* camera, ERenderType renderType)
 
 	SHL->lPassPipe.bind();
 
-	vec3 lightDirection = vec3(1, -cosf(time * 2.0f), 1);
+	vec3 lightDirection = vec3(-cosf(time * 2.0f), -1.0f, sinf(time * 2.0f));
 
 	SHL->lPassPipe.bindUniform("lightDirection", lightDirection);
 	SHL->lPassPipe.bindUniform("lightDiffuse", vec4(1,1,1,1));

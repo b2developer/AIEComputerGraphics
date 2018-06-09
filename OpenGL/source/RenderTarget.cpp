@@ -11,15 +11,15 @@ RenderTarget::RenderTarget()
 	m_targets(nullptr) {
 }
 
-RenderTarget::RenderTarget(unsigned int targetCount, unsigned int width, unsigned int height)
+RenderTarget::RenderTarget(unsigned int targetCount, unsigned int width, unsigned int height, Texture::Format* f)
 	: m_width(0),
 	m_height(0),
 	m_targetCount(0),
 	m_targets(nullptr) {
-	initialise(targetCount, width, height);
+	initialise(targetCount, width, height, f);
 }
 
-bool RenderTarget::initialise(unsigned int targetCount, unsigned int width, unsigned int height) {
+bool RenderTarget::initialise(unsigned int targetCount, unsigned int width, unsigned int height, Texture::Format* f) {
 
 	// setup and bind a framebuffer object
 	glGenFramebuffers(1, &m_fbo);
@@ -34,7 +34,7 @@ bool RenderTarget::initialise(unsigned int targetCount, unsigned int width, unsi
 
 		for (unsigned int i = 0; i < targetCount; ++i) {
 
-			m_targets[i].create(width, height, Texture::RGBA);
+			m_targets[i].create(width, height, f[i]);
 
 			drawBuffers.push_back(GL_COLOR_ATTACHMENT0 + i);
 

@@ -11,22 +11,31 @@ uniform vec4 lightDiffuse;
 uniform sampler2D positionTexture;
 uniform sampler2D normalTexture;
 
-out vec4 lightOutput;
+layout( location = 0) out vec3 lightOutput;
 
 void main() 
 {
 
-	vec3 normal = normalize(texture(normalTexture, vTexCoord).xyz);
+	vec3 normal = texture(normalTexture, vTexCoord).xyz;
 	
-	normal = normal - vec3(0.5f, 0.5f, 0.5f);
-	normal *= 2.0f;
+	float mag = normal.x * normal.x + normal.y * normal.y + normal.z * normal.z;
 	
-	vec3 L = normalize(lightDirection);
+	if (mag < 0.1f)
+	{
+		lightOutput = vec3(0,0,0);
+	}
+	else
+	{
+		normal = normalize(normal);
 	
-	vec3 position = texture(positionTexture, vTexCoord).xyz;
-	
-	vec3 pt = texture(positionTexture, vTexCoord).rgb;
-	
-	float d = max(0, dot(normal, -L));
-	lightOutput = vec4(lightDiffuse.rgb * d, 1) + vec4(pt,1) * 0.001f;
+		vec3 L = normalize(lightDirection);
+		
+		vec3 position = texture(positionTexture, vTexCoord).xyz;
+		
+		vec3 pt = texture(positionTexture, vTexCoord).rgb;
+		
+		float d = max(0, dot(normal, -L));
+		lightOutput = lightDiffuse.rgb * d;
+	}
 }
+

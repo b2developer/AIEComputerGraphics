@@ -29,9 +29,6 @@ public:
 
 	float time = 0.0f;
 
-	//pointer to the shader rendering the scene
-	ShaderProgram * shaderPipe;
-
 	//list of gameObjects in the scene
 	vector<GameObject*> gameObjects;
 

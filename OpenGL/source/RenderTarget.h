@@ -8,10 +8,10 @@ class RenderTarget {
 public:
 
 	RenderTarget();
-	RenderTarget(unsigned int targetCount, unsigned int width, unsigned int height);
+	RenderTarget(unsigned int targetCount, unsigned int width, unsigned int height, Texture::Format* f);
 	virtual ~RenderTarget();
 
-	bool initialise(unsigned int targetCount, unsigned int width, unsigned int height);
+	bool initialise(unsigned int targetCount, unsigned int width, unsigned int height, Texture::Format* f);
 
 	void bind();
 	void unbind();

@@ -165,47 +165,7 @@ bool OBJMesh::load(const char* filename, bool loadTextures /* = true */, bool fl
 
 void OBJMesh::draw(mat4 viewProjection, ERenderType renderType) 
 {
-	//incorrect pass
-	if (renderType == ERenderType::LIGHTING_PASS || renderType == ERenderType::POST_PROCESSING_PASS)
-	{
-		return;
-	}
-
-	//albedo pass
-	if (renderType == ERenderType::ALBEDO_PASS)
-	{
-		SHL->albedoPipe.bind();
-
-		SHL->albedoPipe.bindUniform("useTexture", useTexture);
-
-		//create the view matrix
-		auto pvm = viewProjection * gameObject->transform->translationMatrix;
-		SHL->albedoPipe.bindUniform("ProjectionViewModel", pvm);
-	}
-	else if (renderType == ERenderType::POSITION_PASS) 
-	{
-		SHL->positionPipe.bind();
-
-		//create the view matrix
-		auto pvm = viewProjection * gameObject->transform->translationMatrix;
-		SHL->positionPipe.bindUniform("ProjectionViewModel", pvm);
-		SHL->positionPipe.bindUniform("ModelMatrix", gameObject->transform->translationMatrix);
-	}
-	else if (renderType == ERenderType::NORMAL_PASS)
-	{
-		SHL->normalPipe.bind();
-
-		SHL->normalPipe.bindUniform("useTexture", useTexture);
-
-		//create the view matrix
-		auto pvm = viewProjection * gameObject->transform->translationMatrix;
-		SHL->normalPipe.bindUniform("ProjectionViewModel", pvm);
-
-		//create the normal matrix (rotation matrix of the model)
-		mat3 nm = glm::lookAt(vec3(0, 0, 0), gameObject->transform->forward, vec3(0, 1, 0));
-		SHL->normalPipe.bindUniform("NormalMatrix", nm);
-	}
-	else if (renderType == ERenderType::G_PASS)
+	if (renderType == ERenderType::G_PASS)
 	{
 		SHL->gPassPipe.bind();
 
@@ -221,6 +181,10 @@ void OBJMesh::draw(mat4 viewProjection, ERenderType renderType)
 		//create the normal matrix (rotation matrix of the model)
 		mat3 nm = glm::lookAt(vec3(0, 0, 0), gameObject->transform->forward, vec3(0, 1, 0));
 		SHL->gPassPipe.bindUniform("NormalMatrix", nm);
+	}
+	else
+	{
+		return;
 	}
 
 	bool usePatches = false;

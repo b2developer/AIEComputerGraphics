@@ -84,14 +84,13 @@ void RenderMesh::draw(mat4 viewProjection, ERenderType renderType)
 
 		texture->bind(0);
 	}
-	
-	if (renderType == renderingType && renderType == ERenderType::LIGHTING_PASS)
+	else if (renderType == renderingType && renderType == ERenderType::LIGHTING_PASS)
 	{
 		SHL->lPassPipe.bind();
 
-		SHL->lPassPipe.bindUniform("position", position);
-		SHL->lPassPipe.bindUniform("scale", scale);
-		SHL->lPassPipe.bindUniform("depth", depth);
+		SHL->lPassPipe.bindUniform("position", vec2(0,0));
+		SHL->lPassPipe.bindUniform("scale", vec2(1,1));
+		SHL->lPassPipe.bindUniform("depth", 0.0f);
 
 		SHL->lPassPipe.bindUniform("positionTexture", 1);
 		SHL->lPassPipe.bindUniform("normalTexture", 2);
@@ -107,6 +106,31 @@ void RenderMesh::draw(mat4 viewProjection, ERenderType renderType)
 		{
 			buffer2->bind(2);
 		}
+	}
+	else if (renderType == renderingType && renderType == ERenderType::COMPOSITE_PASS)
+	{
+
+		SHL->compositePassPipe.bind();
+		SHL->compositePassPipe.bindUniform("position", position);
+		SHL->compositePassPipe.bindUniform("scale", scale);
+		SHL->compositePassPipe.bindUniform("depth", depth);
+
+		SHL->compositePassPipe.bindUniform("albedoTexture", 0);
+		SHL->compositePassPipe.bindUniform("lightTexture", 1);
+
+		if (buffer1 != nullptr)
+		{
+			buffer1->bind(0);
+		}
+
+		if (buffer2 != nullptr)
+		{
+			buffer2->bind(1);
+		}
+	}
+	else
+	{
+		return;
 	}
 
 	glBindVertexArray(vao);

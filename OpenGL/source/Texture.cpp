@@ -126,8 +126,14 @@ namespace aie {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 			break;
 		case RGBA:
-		default:
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+			break;
+		case RGB8:
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_width, m_height, 0, GL_RGBA, GL_INT, pixels);
+			break;
+		case RGB32:
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, m_width, m_height, 0, GL_RGBA, GL_FLOAT, pixels);
+			break;
 		};
 
 		glBindTexture(GL_TEXTURE_2D, 0);

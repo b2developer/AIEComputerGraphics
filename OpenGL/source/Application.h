@@ -40,20 +40,15 @@ public:
 
 	std::string rootFolder;
 
-	//pipeline for the shaders
-	ShaderProgram simplePipe;
-	ShaderProgram normalPipe;
-
 	Scene* scene;
 	GameObject* cameraObject;
 
 	Texture* texture;
 	Texture* texture2;
 
-	RenderTarget albedoRender;
-	RenderTarget positionRender;
-	RenderTarget normalRender;
 	RenderTarget postRender;
+	RenderTarget lightRender;
+	RenderTarget compRender;
 
 	/*
 	* Application()

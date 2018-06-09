@@ -12,7 +12,9 @@ namespace aie {
 			RED = 1,
 			RG,
 			RGB,
-			RGBA
+			RGBA,
+			RGB8,
+			RGB32
 		};
 
 		Texture();
