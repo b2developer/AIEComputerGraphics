@@ -39,7 +39,9 @@ void Scene::draw(GameObject* camera, ERenderType renderType)
 	vec3 lightDirection = vec3(-cosf(time * 2.0f), -1.0f, sinf(time * 2.0f));
 
 	SHL->lPassPipe.bindUniform("lightDirection", lightDirection);
-	SHL->lPassPipe.bindUniform("lightDiffuse", vec4(1,1,1,1));
+	SHL->lPassPipe.bindUniform("lightDiffuse", vec3(1, 1, 1));
+	SHL->lPassPipe.bindUniform("lightSpecular", vec3(1, 1, 1));
+	SHL->lPassPipe.bindUniform("cameraPosition", c->gameObject->transform->position);
 
 	//iterate through all gameObjects, drawing each
 	for (vector<GameObject*>::iterator iter = gameObjects.begin(); iter != gameObjects.end(); iter++)

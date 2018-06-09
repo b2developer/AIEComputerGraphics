@@ -27,6 +27,8 @@ public:
 	Texture * texture;
 	Texture * buffer1 = nullptr;
 	Texture * buffer2 = nullptr;
+	Texture * buffer3 = nullptr;
+	Texture * buffer4 = nullptr;
 
 	//amount of triangles in the mesh
 	unsigned int triCount = 0;

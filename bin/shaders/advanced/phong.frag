@@ -5,13 +5,19 @@ in vec2 vTexCoord;
 
 //directional light information
 uniform vec3 lightDirection;
-uniform vec4 lightDiffuse;
+uniform vec3 lightDiffuse;
+uniform vec3 lightSpecular;
+
+uniform vec3 cameraPosition;
 
 //informational buffers from G-Pass
 uniform sampler2D positionTexture;
 uniform sampler2D normalTexture;
+uniform sampler2D specularTexture;
+uniform sampler2D specularPowerTexture;
 
-layout( location = 0) out vec3 lightOutput;
+layout( location = 0 ) out vec3 lightOutput;
+layout( location = 1 ) out vec3 specularOutput;
 
 void main() 
 {
@@ -23,19 +29,31 @@ void main()
 	if (mag < 0.1f)
 	{
 		lightOutput = vec3(0,0,0);
+		specularOutput = vec3(0,0,0);
 	}
 	else
 	{
-		normal = normalize(normal);
+		vec3 N = normalize(normal);
 	
 		vec3 L = normalize(lightDirection);
 		
 		vec3 position = texture(positionTexture, vTexCoord).xyz;
 		
-		vec3 pt = texture(positionTexture, vTexCoord).rgb;
+		float lambertTerm = max(0, min(1, dot(N, -L)));
 		
-		float d = max(0, dot(normal, -L));
-		lightOutput = lightDiffuse.rgb * d;
+		//relative vector from the fragment position to the camera
+		vec3 V = normalize(cameraPosition - position);
+		
+		//direction of light reflecting off the surface
+		vec3 R = reflect(L, N);
+		
+		vec4 specular = texture(specularTexture, vTexCoord);
+		float specularPower = 1 / texture(specularPowerTexture, vTexCoord).r;
+		
+		float specularTerm = pow(max(0, dot(R,V)), specularPower);
+		
+		lightOutput = lightDiffuse.rgb * lambertTerm;
+		specularOutput = lightSpecular.rgb * specular.rgb * specularTerm;
 	}
 }
 

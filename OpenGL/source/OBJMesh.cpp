@@ -171,6 +171,7 @@ void OBJMesh::draw(mat4 viewProjection, ERenderType renderType)
 
 		SHL->gPassPipe.bindUniform("useTexture", useTexture);
 		SHL->gPassPipe.bindUniform("useNormalTexture", useTexture);
+		SHL->gPassPipe.bindUniform("useSpecularTexture", useTexture);
 
 		//create all neccessary matrice
 		auto pvm = viewProjection * gameObject->transform->translationMatrix;

@@ -109,20 +109,22 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	SHL->linkShaders();
 	//------------------------------------------------------------------------------
 
-	Texture::Format formatting[4] = { Texture::Format::RGB8, Texture::Format::RGB32, Texture::Format::RGB32, Texture::Format::RGBA };
+	Texture::Format formatting[8] = { Texture::Format::RGB8, Texture::Format::RGB32, Texture::Format::RGB32, Texture::Format::RGB32, Texture::Format::RED,
+									  Texture::Format::RGBA, Texture::Format::RGB32,
+									  Texture::Format::RGBA};
 
 	//check render target initialised properly
-	if (postRender.initialise(3, width, height, formatting) == false)
+	if (postRender.initialise(5, width, height, formatting) == false)
 	{
 		return false;
 	}
 
-	if (lightRender.initialise(1, width, height, &formatting[0]) == false)
+	if (lightRender.initialise(2, width, height, &formatting[5]) == false)
 	{
 		return false;
 	}
 
-	if (compRender.initialise(1, width, height, &formatting[3]) == false)
+	if (compRender.initialise(1, width, height, &formatting[7]) == false)
 	{
 		return false;
 	}
@@ -210,10 +212,12 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	//------------------------------------------------------------------------------
 	GameObject* lightGO = new GameObject();
 
-	RenderMesh* lightRM = new RenderMesh(&lightRender.m_targets[0], vec2(1 - 0.333f, 1 - 0.666f), vec2(0.333f, 0.333f), 0.0f, ERenderType::LIGHTING_PASS);
+	RenderMesh* lightRM = new RenderMesh(nullptr, vec2(1 - 0.333f, 1 - 0.666f), vec2(0.333f, 0.333f), 0.0f, ERenderType::LIGHTING_PASS);
 
 	lightRM->buffer1 = &postRender.m_targets[1];
 	lightRM->buffer2 = &postRender.m_targets[2];
+	lightRM->buffer3 = &postRender.m_targets[3];
+	lightRM->buffer4 = &postRender.m_targets[4];
 
 	lightRM->gameObject = lightGO;
 	lightGO->components.push_back(lightRM);
@@ -227,6 +231,7 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 
 	compRM->buffer1 = &postRender.m_targets[0];
 	compRM->buffer2 = &lightRender.m_targets[0];
+	compRM->buffer3 = &lightRender.m_targets[1];
 
 	compRM->gameObject = compGO;
 	compGO->components.push_back(compRM);

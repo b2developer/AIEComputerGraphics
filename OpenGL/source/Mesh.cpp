@@ -63,6 +63,14 @@ void Mesh::initialiseQuad()
 	vertices[4].position = { 0.5f, 0, 0.5f, 1 };
 	vertices[5].position = { 0.5f, 0, -0.5f, 1 };
 
+	vertices[0].normal = { 0, 1.0f, 0, 1.0f};
+	vertices[1].normal = { 0, 1.0f, 0, 1.0f };
+	vertices[2].normal = { 0, 1.0f, 0, 1.0f };
+
+	vertices[3].normal = { 0, 1.0f, 0, 1.0f };
+	vertices[4].normal = { 0, 1.0f, 0, 1.0f };
+	vertices[5].normal = { 0, 1.0f, 0, 1.0f };
+
 	vertices[0].texCoord = { 0, 1 };
 	vertices[1].texCoord = { 1, 1 };
 	vertices[2].texCoord = { 0, 0 };
@@ -78,9 +86,13 @@ void Mesh::initialiseQuad()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
+	//define the second element as the normal
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(vec4(1)) * 1));
+
 	//define the third element as texture coords
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)32);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(vec4(1)) * 2));
 
 	//unbind buffers, as a safety measure
 	//this allows the vertex arrays to be bound again
@@ -113,9 +125,13 @@ void Mesh::initialise(unsigned int vertexCount, const Vertex * vertices, unsigne
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
+	//define the second element as the normal
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(vec4(1)) * 1));
+
 	//define the third element as texture coords
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)32);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(vec4(1)) * 2));
 
 	//bind indices if there are any to bind
 	if (indexCount != 0)
@@ -153,6 +169,7 @@ void Mesh::draw(mat4 viewProjection, ERenderType renderType)
 
 		SHL->gPassPipe.bindUniform("useTexture", 1);
 		SHL->gPassPipe.bindUniform("useNormalTexture", 0);
+		SHL->gPassPipe.bindUniform("useSpecularTexture", 0);
 
 		//create all neccessary matrice
 		auto pvm = viewProjection * gameObject->transform->translationMatrix;
@@ -165,6 +182,9 @@ void Mesh::draw(mat4 viewProjection, ERenderType renderType)
 		SHL->gPassPipe.bindUniform("NormalMatrix", nm);
 
 		SHL->gPassPipe.bindUniform("Kd", vec3(1, 1, 1));
+		SHL->gPassPipe.bindUniform("Ks", vec3(0, 0, 0));
+		SHL->gPassPipe.bindUniform("specularPower", 0.0f);
+
 		SHL->gPassPipe.bindUniform("diffuseTexture", 0);
 
 		texture->bind(0);

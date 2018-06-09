@@ -9,13 +9,20 @@ in vec2 vTexCoord;
 
 uniform int useTexture = 0;
 uniform int useNormalTexture = 0;
+uniform int useSpecularTexture = 0;
 uniform vec3 Kd;
+uniform vec3 Ks;
+uniform float specularPower = 0.0f;
+
 uniform sampler2D diffuseTexture;
 uniform sampler2D normalTexture;
+uniform sampler2D specularTexture;
 
 layout(location = 0) out vec3 albedoC;
 layout(location = 1) out vec3 positionC;
 layout(location = 2) out vec3 normalC;
+layout(location = 3) out vec3 specularC;
+layout(location = 4) out float specularPowerC;
 
 void main() 
 {
@@ -47,4 +54,9 @@ void main()
 		
 		normalC = N;
 	}
+	
+	int insT = 1 - useSpecularTexture;
+
+	specularC = (texture(specularTexture, vTexCoord).rgb + vec3(insT, insT, insT)) * Ks;
+	specularPowerC = 1 / (specularPower + 0.00001f);
 }

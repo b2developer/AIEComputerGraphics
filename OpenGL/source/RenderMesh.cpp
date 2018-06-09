@@ -74,6 +74,12 @@ void RenderMesh::draw(mat4 viewProjection, ERenderType renderType)
 {
 	if (renderType == ERenderType::POST_PROCESSING_PASS)
 	{
+		//no texture to render, cancel the draw call
+		if (texture == nullptr)
+		{
+			return;
+		}
+
 		SHL->postProcessingPipe.bind();
 
 		SHL->postProcessingPipe.bindUniform("position", position);
@@ -94,8 +100,8 @@ void RenderMesh::draw(mat4 viewProjection, ERenderType renderType)
 
 		SHL->lPassPipe.bindUniform("positionTexture", 1);
 		SHL->lPassPipe.bindUniform("normalTexture", 2);
-
-		texture->bind(0);
+		SHL->lPassPipe.bindUniform("specularTexture", 3);
+		SHL->lPassPipe.bindUniform("specularPowerTexture", 4);
 
 		if (buffer1 != nullptr)
 		{
@@ -105,6 +111,16 @@ void RenderMesh::draw(mat4 viewProjection, ERenderType renderType)
 		if (buffer2 != nullptr)
 		{
 			buffer2->bind(2);
+		}
+
+		if (buffer3 != nullptr)
+		{
+			buffer3->bind(3);
+		}
+
+		if (buffer4 != nullptr)
+		{
+			buffer4->bind(4);
 		}
 	}
 	else if (renderType == renderingType && renderType == ERenderType::COMPOSITE_PASS)
@@ -117,6 +133,7 @@ void RenderMesh::draw(mat4 viewProjection, ERenderType renderType)
 
 		SHL->compositePassPipe.bindUniform("albedoTexture", 0);
 		SHL->compositePassPipe.bindUniform("lightTexture", 1);
+		SHL->compositePassPipe.bindUniform("specularTexture", 2);
 
 		if (buffer1 != nullptr)
 		{
@@ -126,6 +143,11 @@ void RenderMesh::draw(mat4 viewProjection, ERenderType renderType)
 		if (buffer2 != nullptr)
 		{
 			buffer2->bind(1);
+		}
+
+		if (buffer3 != nullptr)
+		{
+			buffer3->bind(2);
 		}
 	}
 	else
