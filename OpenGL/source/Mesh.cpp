@@ -10,21 +10,12 @@
 //constructor
 Mesh::Mesh(Texture* inTexture)
 {
-
-	kD = new float[4];
-	kD[0] = 1.0f;
-	kD[1] = 0.0f;
-	kD[2] = 1.0f;
-	kD[3] = 1.0f;
-
 	texture = inTexture;
 }
 
 //destructor
 Mesh::~Mesh()
 {
-	delete kD;
-
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
 	glDeleteBuffers(1, &ibo);

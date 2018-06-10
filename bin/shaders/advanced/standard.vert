@@ -28,5 +28,5 @@ void main()
 	vTangent = NormalMatrix * Tangent.xyz;
 	vBiTangent = cross(vNormal, vTangent) * Tangent.w;
 	
-	gl_Position = ProjectionViewModel * Position; 
+	gl_Position = ProjectionViewModel * Position;
 }

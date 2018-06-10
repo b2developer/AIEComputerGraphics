@@ -18,10 +18,6 @@ using namespace aie;
 */
 class Mesh : public Component
 {
-private:
-
-	float* kD;
-
 public:
 
 	Texture * texture;
