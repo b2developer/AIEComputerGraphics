@@ -4,6 +4,7 @@
 #include <glm/ext.hpp>
 
 #include "Shader.h"
+#include "Texture.h"
 
 #include "RenderType.h"
 

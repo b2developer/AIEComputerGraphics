@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClCompile Include="source\Application.cpp" />
     <ClCompile Include="source\Camera.cpp" />
+    <ClCompile Include="source\DirectionalLight.cpp" />
     <ClCompile Include="source\FlyCamera.cpp" />
     <ClCompile Include="source\GameObject.cpp" />
     <ClCompile Include="source\Gizmos.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Mesh.cpp" />
     <ClCompile Include="source\OBJMesh.cpp" />
+    <ClCompile Include="source\PointLight.cpp" />
     <ClCompile Include="source\RenderMesh.cpp" />
     <ClCompile Include="source\RenderTarget.cpp" />
     <ClCompile Include="source\Scene.cpp" />
@@ -170,6 +172,7 @@
     <ClInclude Include="source\Application.h" />
     <ClInclude Include="source\Camera.h" />
     <ClInclude Include="source\Component.h" />
+    <ClInclude Include="source\DirectionalLight.h" />
     <ClInclude Include="source\FlyCamera.h" />
     <ClInclude Include="source\GameObject.h" />
     <ClInclude Include="source\Gizmos.h" />
@@ -178,6 +181,7 @@
     <ClInclude Include="source\InputCallbacks.h" />
     <ClInclude Include="source\Mesh.h" />
     <ClInclude Include="source\OBJMesh.h" />
+    <ClInclude Include="source\PointLight.h" />
     <ClInclude Include="source\RenderMesh.h" />
     <ClInclude Include="source\RenderTarget.h" />
     <ClInclude Include="source\RenderType.h" />

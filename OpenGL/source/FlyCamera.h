@@ -81,9 +81,9 @@ public:
 	*
 	* called once per frame after the update loop
 	*
-	* @param mat4 viewProjection - the camera matrix
+	* @param Camera* camera - the pov to render the component
 	* @param ERenderType renderType - the type of pass to perform on the fragment shader
 	* @returns void
 	*/
-	void draw(mat4 viewProjection, ERenderType renderType) override {}
+	void draw(Camera* camera, ERenderType renderType) override {}
 };

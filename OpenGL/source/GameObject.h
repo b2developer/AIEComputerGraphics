@@ -11,6 +11,7 @@ using namespace std;
 //forward declaration
 class Component;
 class Transform;
+class Camera;
 
 /*
 * class GameObject
@@ -60,8 +61,8 @@ public:
 	* called once per frame afte the update loop
 	* draws all components
 	*
-	* @param mat4 viewProjection - the camera matrix
+	* @param Camera* camera - the pov that is rendering the gameobject
 	* @returns void
 	*/
-	void draw(mat4 viewProjectionMatrix, ERenderType renderType);
+	void draw(Camera* camera, ERenderType renderType);
 };

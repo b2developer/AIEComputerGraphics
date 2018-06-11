@@ -84,7 +84,7 @@ public:
 	bool load(const char* filename, bool loadTextures = true, bool flipTextureV = false);
 
 	// allow option to draw as patches for tessellation
-	void draw(mat4 viewProjection, ERenderType renderType) override;
+	void draw(Camera* camera, ERenderType renderType) override;
 
 	// access to the filename that was loaded
 	const std::string& getFilename() const { return m_filename; }

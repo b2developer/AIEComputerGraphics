@@ -1,4 +1,4 @@
-#include "RenderMesh.h"
+#include "DirectionalLight.h"
 #include "GameObject.h"
 #include "Transform.h"
 #include "Camera.h"
@@ -9,13 +9,14 @@
 #include "ShaderLibrary.h"
 
 //constructor
-RenderMesh::RenderMesh(Texture* inTexture, vec2 inPosition, vec2 inScale, float inDepth, ERenderType inType) : position(inPosition), scale(inScale), depth(inDepth), renderingType(inType)
+DirectionalLight::DirectionalLight(ShaderProgram* inLightShader, Texture* inPosition, Texture* inNormal, Texture* inSpecular, Texture* inSpecularP) : lightShader(inLightShader), positionBuffer(inPosition),
+																																					  normalBuffer(inNormal), specularBuffer(inSpecular), specularPowerBuffer(inSpecularP)
 {
-	texture = inTexture;
+	
 }
 
 //destructor
-RenderMesh::~RenderMesh()
+DirectionalLight::~DirectionalLight()
 {
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
@@ -23,13 +24,13 @@ RenderMesh::~RenderMesh()
 }
 
 //initialisation
-void RenderMesh::start()
+void DirectionalLight::start()
 {
 	initialiseQuad();
 }
 
 //set the buffers to render
-void RenderMesh::initialiseQuad()
+void DirectionalLight::initialiseQuad()
 {
 	//check the mesh wasn't initialised
 	assert(vao == 0);
@@ -49,10 +50,10 @@ void RenderMesh::initialiseQuad()
 	{
 		-1,1,
 		-1,-1,
-		 1,1,
+		1,1,
 		-1,-1,
-		 1,-1,
-		 1,1
+		1,-1,
+		1,1
 	};
 
 	//fill the vertex buffer
@@ -71,52 +72,31 @@ void RenderMesh::initialiseQuad()
 }
 
 //main render loop
-void RenderMesh::draw(Camera* camera, ERenderType renderType)
+void DirectionalLight::draw(Camera* camera, ERenderType renderType)
 {
-	if (renderType == ERenderType::POST_PROCESSING_PASS)
-	{
-		//no texture to render, cancel the draw call
-		if (texture == nullptr)
-		{
-			return;
-		}
+	if (renderType == ERenderType::LIGHTING_PASS)
+	{		
+		lightShader->bind();
 
-		SHL->postProcessingPipe.bind();
+		lightShader->bindUniform("position", vec2(0, 0));
+		lightShader->bindUniform("scale", vec2(1, 1));
+		lightShader->bindUniform("depth", 0.0f);
 
-		SHL->postProcessingPipe.bindUniform("position", position);
-		SHL->postProcessingPipe.bindUniform("scale", scale);
-		SHL->postProcessingPipe.bindUniform("depth", depth);
+		lightShader->bindUniform("cameraPosition", camera->gameObject->transform->position);
 
-		SHL->postProcessingPipe.bindUniform("displayTexture", 0);
+		lightShader->bindUniform("lightDirection", direction);
+		lightShader->bindUniform("lightDiffuse", diffuse);
+		lightShader->bindUniform("lightSpecular", specular);
 
-		texture->bind(0);
-	}
-	else if (renderType == renderingType && renderType == ERenderType::COMPOSITE_PASS)
-	{
+		lightShader->bindUniform("positionTexture", 0);
+		lightShader->bindUniform("normalTexture", 1);
+		lightShader->bindUniform("specularTexture", 2);
+		lightShader->bindUniform("specularPowerTexture", 3);
 
-		SHL->compositePassPipe.bind();
-		SHL->compositePassPipe.bindUniform("position", position);
-		SHL->compositePassPipe.bindUniform("scale", scale);
-		SHL->compositePassPipe.bindUniform("depth", depth);
-
-		SHL->compositePassPipe.bindUniform("albedoTexture", 0);
-		SHL->compositePassPipe.bindUniform("lightTexture", 1);
-		SHL->compositePassPipe.bindUniform("specularTexture", 2);
-
-		if (buffer1 != nullptr)
-		{
-			buffer1->bind(0);
-		}
-
-		if (buffer2 != nullptr)
-		{
-			buffer2->bind(1);
-		}
-
-		if (buffer3 != nullptr)
-		{
-			buffer3->bind(2);
-		}
+		positionBuffer->bind(0);
+		normalBuffer->bind(1);
+		specularBuffer->bind(2);
+		specularPowerBuffer->bind(3);
 	}
 	else
 	{

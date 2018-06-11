@@ -34,7 +34,10 @@ public:
 
 	ShaderProgram postProcessingPipe;
 	ShaderProgram gPassPipe;
-	ShaderProgram lPassPipe;
+
+	ShaderProgram directionalLightPipe;
+	ShaderProgram pointLightPipe;
+
 	ShaderProgram compositePassPipe;
 
 	/*

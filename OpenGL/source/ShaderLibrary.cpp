@@ -28,9 +28,14 @@ void ShaderLibrary::linkShaders()
 		std::cout << "Shader Error (G-Pass Shader): " << '\n' << gPassPipe.getLastError() << '\n';
 	}
 
-	if (lPassPipe.link() == false)
+	if (directionalLightPipe.link() == false)
 	{
-		std::cout << "Shader Error (L-Pass Shader): " << '\n' << lPassPipe.getLastError() << '\n';
+		std::cout << "Shader Error (Directional Light Shader): " << '\n' << directionalLightPipe.getLastError() << '\n';
+	}
+
+	if (pointLightPipe.link() == false)
+	{
+		std::cout << "Shader Error (Point Light Shader): " << '\n' << pointLightPipe.getLastError() << '\n';
 	}
 
 	if (compositePassPipe.link() == false)

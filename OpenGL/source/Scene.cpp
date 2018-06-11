@@ -3,6 +3,8 @@
 #include "Transform.h"
 #include "Camera.h"
 
+#include <gl_core_4_4.h>
+
 #include "ShaderLibrary.h"
 
 //destructor
@@ -31,21 +33,29 @@ void Scene::update(float deltaTime)
 void Scene::draw(GameObject* camera, ERenderType renderType)
 {
 	Camera* c = (Camera*)camera->components[1];
+	
+	//combine multiple lighting passes
+	if (renderType == ERenderType::LIGHTING_PASS)
+	{
+		//permenant settings
+		glEnable(GL_CULL_FACE);
+		glBlendFunc(GL_ONE, GL_ONE);
 
-	mat4 viewProjectionMatrix = c->projectionMatrix * c->gameObject->transform->translationMatrix;
-
-	SHL->lPassPipe.bind();
-
-	vec3 lightDirection = vec3(-cosf(time * 2.0f), -1.0f, sinf(time * 2.0f));
-
-	SHL->lPassPipe.bindUniform("lightDirection", lightDirection);
-	SHL->lPassPipe.bindUniform("lightDiffuse", vec3(1, 1, 1));
-	SHL->lPassPipe.bindUniform("lightSpecular", vec3(1, 1, 1));
-	SHL->lPassPipe.bindUniform("cameraPosition", c->gameObject->transform->position);
+		//need to be enabled / disabled every frame
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND); 
+	}
 
 	//iterate through all gameObjects, drawing each
 	for (vector<GameObject*>::iterator iter = gameObjects.begin(); iter != gameObjects.end(); iter++)
 	{
-		(*iter)->draw(viewProjectionMatrix, renderType);
+		(*iter)->draw(c, renderType);
+	}
+
+	//reverse the gl option changes for lighting passes
+	if (renderType == ERenderType::LIGHTING_PASS)
+	{
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
 	}
 }

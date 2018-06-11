@@ -1,6 +1,7 @@
 #include "Mesh.h"
 #include "GameObject.h"
 #include "Transform.h"
+#include "Camera.h"
 
 #include <gl_core_4_4.h>
 #include <GLFW/glfw3.h>
@@ -129,10 +130,10 @@ void Mesh::initialise(unsigned int vertexCount, const Vertex * vertices, unsigne
 	{
 		glGenBuffers(1, &ibo);
 
-		//bind vertex buffer
+		//bind index buffer
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
-		//file vertex buffer
+		//file index buffer
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
 		//1 triangle for every 3 indices
@@ -151,7 +152,7 @@ void Mesh::initialise(unsigned int vertexCount, const Vertex * vertices, unsigne
 }
 
 //main render loop
-void Mesh::draw(mat4 viewProjection, ERenderType renderType)
+void Mesh::draw(Camera* camera, ERenderType renderType)
 {
 
 	if (renderType == ERenderType::G_PASS)
@@ -163,7 +164,7 @@ void Mesh::draw(mat4 viewProjection, ERenderType renderType)
 		SHL->gPassPipe.bindUniform("useSpecularTexture", 0);
 
 		//create all neccessary matrice
-		auto pvm = viewProjection * gameObject->transform->translationMatrix;
+		auto pvm = camera->viewMatrix * gameObject->transform->translationMatrix;
 
 		SHL->gPassPipe.bindUniform("ProjectionViewModel", pvm);
 		SHL->gPassPipe.bindUniform("ModelMatrix", gameObject->transform->translationMatrix);

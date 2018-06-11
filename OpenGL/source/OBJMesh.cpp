@@ -7,6 +7,7 @@
 
 #include "GameObject.h"
 #include "Transform.h"
+#include "Camera.h"
 
 #include "ShaderLibrary.h"
 
@@ -163,7 +164,7 @@ bool OBJMesh::load(const char* filename, bool loadTextures /* = true */, bool fl
 	return true;
 }
 
-void OBJMesh::draw(mat4 viewProjection, ERenderType renderType) 
+void OBJMesh::draw(Camera* camera, ERenderType renderType) 
 {
 	if (renderType == ERenderType::G_PASS)
 	{
@@ -174,7 +175,7 @@ void OBJMesh::draw(mat4 viewProjection, ERenderType renderType)
 		SHL->gPassPipe.bindUniform("useSpecularTexture", useTexture);
 
 		//create all neccessary matrice
-		auto pvm = viewProjection * gameObject->transform->translationMatrix;
+		auto pvm = camera->viewMatrix * gameObject->transform->translationMatrix;
 
 		SHL->gPassPipe.bindUniform("ProjectionViewModel", pvm);
 		SHL->gPassPipe.bindUniform("ModelMatrix", gameObject->transform->translationMatrix);

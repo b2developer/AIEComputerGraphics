@@ -18,6 +18,9 @@
 #include "OBJMesh.h"
 #include "RenderMesh.h"
 
+#include "DirectionalLight.h"
+#include "PointLight.h"
+
 //constructor
 Application::Application()
 {
@@ -100,8 +103,11 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	SHL->gPassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/standard.vert").c_str());
 	SHL->gPassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/gpass.frag").c_str());
 
-	SHL->lPassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
-	SHL->lPassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/phong.frag").c_str());
+	SHL->directionalLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
+	SHL->directionalLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/phong.frag").c_str());
+
+	SHL->pointLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/light.vert").c_str());
+	SHL->pointLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/phong_point.frag").c_str());
 
 	SHL->compositePassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
 	SHL->compositePassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/composite.frag").c_str());
@@ -109,9 +115,11 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	SHL->linkShaders();
 	//------------------------------------------------------------------------------
 
-	Texture::Format formatting[8] = { Texture::Format::RGB8, Texture::Format::RGB32, Texture::Format::RGB32, Texture::Format::RGB32, Texture::Format::RED,
-									  Texture::Format::RGBA, Texture::Format::RGB32,
-									  Texture::Format::RGBA};
+	//colour formats for render textures
+	Texture::Format formatting[8] = { Texture::Format::RGB8, Texture::Format::RGB32, Texture::Format::RGB32, Texture::Format::RGB32, Texture::Format::RED,	//post render
+									  Texture::Format::RGBA, Texture::Format::RGB32,																		//light render
+									  Texture::Format::RGBA};																								//composite render
+
 
 	//check render target initialised properly
 	if (postRender.initialise(5, width, height, formatting) == false)
@@ -259,6 +267,35 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	mesh3->start();
 	//------------------------------------------------------------------------------
 
+	//------------------------------------------------------------------------------
+	GameObject* directionObject = new GameObject;
+
+	DirectionalLight* dl = new DirectionalLight(&SHL->directionalLightPipe, &postRender.m_targets[1], &postRender.m_targets[2], &postRender.m_targets[3], &postRender.m_targets[4]);
+
+	dl->direction = vec3(1, 1, 1);
+	dl->diffuse = vec3(1, 1, 1);
+	dl->specular = vec3(1, 1, 1);
+
+	dl->gameObject = directionObject;
+	directionObject->components.push_back(dl);
+	dl->start();
+	//------------------------------------------------------------------------------
+
+	//------------------------------------------------------------------------------
+	GameObject* pointObject = new GameObject();
+
+	PointLight* pl = new PointLight(&SHL->pointLightPipe, &postRender.m_targets[1], &postRender.m_targets[2], &postRender.m_targets[3], &postRender.m_targets[4]);
+
+	pl->position = vec3(-3.5f, 0, 0);
+	pl->radius = 10.0f;
+	pl->diffuse = vec3(1, 0, 1);
+	pl->specular = vec3(1, 1, 1);
+
+	pl->gameObject = pointObject;
+	pointObject->components.push_back(pl);
+	pl->start();
+	//------------------------------------------------------------------------------
+
 	scene->gameObjects.push_back(cameraObject);
 	scene->gameObjects.push_back(meshObject);
 	scene->gameObjects.push_back(meshObject2);
@@ -267,6 +304,8 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 
 	scene->gameObjects.push_back(lightGO);
 	scene->gameObjects.push_back(compGO);
+	scene->gameObjects.push_back(directionObject);
+	scene->gameObjects.push_back(pointObject);
 
 	INP->setCursorLockMode(ECursorLock::NONE);
 
@@ -355,6 +394,7 @@ void Application::draw()
 
 	scene->draw(cameraObject, ERenderType::POST_PROCESSING_PASS);
 
+	/*
 	Gizmos::clear(); //removes all existing gizmos
 
 	vec4 white(1);
@@ -371,4 +411,5 @@ void Application::draw()
 	mat4 viewProjectionMatrix = c->projectionMatrix * c->gameObject->transform->translationMatrix;
 
 	Gizmos::draw(c->projectionMatrix * c->gameObject->transform->translationMatrix);
+	*/
 }

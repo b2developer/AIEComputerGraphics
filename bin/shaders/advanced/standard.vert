@@ -21,12 +21,14 @@ uniform mat3 NormalMatrix;
  
 void main() 
 {  
+	vec4 p = Position;
+
 	vNormal = NormalMatrix * Normal.xyz;
 	vTexCoord = TexCoord;
-	position = ModelMatrix * Position;
+	position = ModelMatrix * p;
 	
 	vTangent = NormalMatrix * Tangent.xyz;
 	vBiTangent = cross(vNormal, vTangent) * Tangent.w;
 	
-	gl_Position = ProjectionViewModel * Position;
+	gl_Position = ProjectionViewModel * p;
 }
