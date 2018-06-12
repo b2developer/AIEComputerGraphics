@@ -101,10 +101,11 @@ void PointLight::draw(Camera* camera, ERenderType renderType)
 		//rotatated light position
 		vec3 nlp = nm * position;
 
-		lightShader->bindUniform("radius", radius);
+		lightShader->bindUniform("scale", vec3(radius, radius, radius) * 2.0f);
 		lightShader->bindUniform("lightPosition", gameObject->transform->position + nlp);
 		lightShader->bindUniform("lightDiffuse", diffuse);
 		lightShader->bindUniform("lightSpecular", specular);
+		lightShader->bindUniform("radius", radius);
 
 		lightShader->bindUniform("positionTexture", 0);
 		lightShader->bindUniform("normalTexture", 1);

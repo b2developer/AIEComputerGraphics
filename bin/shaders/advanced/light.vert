@@ -7,12 +7,12 @@ out vec4 position;
 out vec4 vTexCoord;
 
 uniform mat4 ProjectionViewModel;
-uniform float radius;
+uniform vec3 scale;
  
 void main() 
 {  
 	vec4 p = Position;
-	p.xyz *= radius * 2.0f;
+	p.xyz *= scale;
 	
 	gl_Position = ProjectionViewModel * p;
 }

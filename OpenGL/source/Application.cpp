@@ -104,10 +104,10 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	SHL->gPassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/gpass.frag").c_str());
 
 	SHL->directionalLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
-	SHL->directionalLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/phong.frag").c_str());
+	SHL->directionalLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/brdf.frag").c_str());
 
 	SHL->pointLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/light.vert").c_str());
-	SHL->pointLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/phong_point.frag").c_str());
+	SHL->pointLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/brdf_point.frag").c_str());
 
 	SHL->compositePassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
 	SHL->compositePassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/composite.frag").c_str());
@@ -272,7 +272,7 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 
 	DirectionalLight* dl = new DirectionalLight(&SHL->directionalLightPipe, &postRender.m_targets[1], &postRender.m_targets[2], &postRender.m_targets[3], &postRender.m_targets[4]);
 
-	dl->direction = vec3(1, 1, 1);
+	dl->direction = vec3(1, -1, 1);
 	dl->diffuse = vec3(1, 1, 1);
 	dl->specular = vec3(1, 1, 1);
 
