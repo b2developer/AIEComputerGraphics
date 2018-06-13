@@ -38,6 +38,11 @@ void ShaderLibrary::linkShaders()
 		std::cout << "Shader Error (Point Light Shader): " << '\n' << pointLightPipe.getLastError() << '\n';
 	}
 
+	if (spotLightPipe.link() == false)
+	{
+		std::cout << "Shader Error (Spot Light Shader): " << '\n' << spotLightPipe.getLastError() << '\n';
+	}
+
 	if (compositePassPipe.link() == false)
 	{
 		std::cout << "Shader Error (Composite Shader): " << '\n' << compositePassPipe.getLastError() << '\n';

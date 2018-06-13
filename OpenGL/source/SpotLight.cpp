@@ -1,4 +1,4 @@
-#include "PointLight.h"
+#include "SpotLight.h"
 #include "GameObject.h"
 #include "Transform.h"
 #include "Camera.h"
@@ -9,14 +9,14 @@
 #include "ShaderLibrary.h"
 
 //constructor
-PointLight::PointLight(ShaderProgram* inLightShader, Texture* inPosition, Texture* inNormal, Texture* inSpecular, Texture* inSpecularP) : lightShader(inLightShader), positionBuffer(inPosition),
-																																		  normalBuffer(inNormal), specularBuffer(inSpecular), specularPowerBuffer(inSpecularP)
+SpotLight::SpotLight(ShaderProgram* inLightShader, Texture* inPosition, Texture* inNormal, Texture* inSpecular, Texture* inSpecularP) : lightShader(inLightShader), positionBuffer(inPosition),
+normalBuffer(inNormal), specularBuffer(inSpecular), specularPowerBuffer(inSpecularP)
 {
-	
+
 }
 
 //destructor
-PointLight::~PointLight()
+SpotLight::~SpotLight()
 {
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
@@ -24,13 +24,13 @@ PointLight::~PointLight()
 }
 
 //initialisation
-void PointLight::start()
+void SpotLight::start()
 {
 	initialiseCube();
 }
 
 //set the buffers to render
-void PointLight::initialiseCube()
+void SpotLight::initialiseCube()
 {
 	//check the mesh wasn't initialised
 	assert(vao == 0);
@@ -49,17 +49,17 @@ void PointLight::initialiseCube()
 	float cubeVertices[] = { -1,  -1,  1,  1,  1,  -1,  1,  1,  1,  -1,  -1,  1,      -1,  -1,  -1,  1,      -1,  1,  1,  1,      1,  1,  1,  1,  1,  1,  -1,  1,    -1,  1,  -1,  1, };
 
 	unsigned int cubeIndices[] = { 0,  5,  4,
-								   0,  1,  5,
-								   1,  6,  5,
-								   1,  2,  6,
-								   2,  7,  6,
-								   2,  3,  7,
-								   3,  4,  7,
-								   3,  0,  4,
-								   4,  6,  7,
-								   4,  5,  6,
-								   3,  1,  0,
-								   3,  2,  1 };
+		0,  1,  5,
+		1,  6,  5,
+		1,  2,  6,
+		2,  7,  6,
+		2,  3,  7,
+		3,  4,  7,
+		3,  0,  4,
+		4,  6,  7,
+		4,  5,  6,
+		3,  1,  0,
+		3,  2,  1 };
 
 	//fill the vertex buffer
 	glBufferData(GL_ARRAY_BUFFER, 32 * sizeof(float), cubeVertices, GL_STATIC_DRAW);
@@ -82,7 +82,7 @@ void PointLight::initialiseCube()
 }
 
 //main render loop
-void PointLight::draw(Camera* camera, ERenderType renderType)
+void SpotLight::draw(Camera* camera, ERenderType renderType)
 {
 	if (renderType == ERenderType::LIGHTING_PASS)
 	{
@@ -100,12 +100,20 @@ void PointLight::draw(Camera* camera, ERenderType renderType)
 
 		//rotatated light position
 		vec3 nlp = position * nm;
+		vec3 nld = direction * nm;
 
-		lightShader->bindUniform("scale", vec3(radius, radius, radius) * 2.0f);
+		//simple trigonometry to find the horizonal span
+		float span = range / cosf(maxCone);
+
+		lightShader->bindUniform("scale", vec3(span, span, range) * 2.0f);
 		lightShader->bindUniform("lightPosition", gameObject->transform->position + nlp);
+		lightShader->bindUniform("lightDirection", nld);
 		lightShader->bindUniform("lightDiffuse", diffuse);
 		lightShader->bindUniform("lightSpecular", specular);
-		lightShader->bindUniform("radius", radius);
+
+		lightShader->bindUniform("range", range);
+		lightShader->bindUniform("minCone", minCone);
+		lightShader->bindUniform("maxCone", maxCone);
 
 		lightShader->bindUniform("positionTexture", 0);
 		lightShader->bindUniform("normalTexture", 1);

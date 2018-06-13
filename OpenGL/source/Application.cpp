@@ -20,6 +20,7 @@
 
 #include "DirectionalLight.h"
 #include "PointLight.h"
+#include "SpotLight.h"
 
 //constructor
 Application::Application()
@@ -108,6 +109,9 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 
 	SHL->pointLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/light.vert").c_str());
 	SHL->pointLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/brdf_point.frag").c_str());
+
+	SHL->spotLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/light.vert").c_str());
+	SHL->spotLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/brdf_spot.frag").c_str());
 
 	SHL->compositePassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
 	SHL->compositePassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/composite.frag").c_str());
@@ -273,8 +277,8 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	DirectionalLight* dl = new DirectionalLight(&SHL->directionalLightPipe, &postRender.m_targets[1], &postRender.m_targets[2], &postRender.m_targets[3], &postRender.m_targets[4]);
 
 	dl->direction = vec3(1, -1, 1);
-	dl->diffuse = vec3(1, 1, 1);
-	dl->specular = vec3(1, 1, 1);
+	dl->diffuse = vec3(0.25f, 0.25f, 0.25f);
+	dl->specular = vec3(0.25f, 0.25f, 0.25f);
 
 	dl->gameObject = directionObject;
 	directionObject->components.push_back(dl);
@@ -286,14 +290,36 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 
 	PointLight* pl = new PointLight(&SHL->pointLightPipe, &postRender.m_targets[1], &postRender.m_targets[2], &postRender.m_targets[3], &postRender.m_targets[4]);
 
-	pl->position = vec3(-3.5f, 0, 0);
+	pl->position = vec3(-3.5, 0, 0);
 	pl->radius = 10.0f;
-	pl->diffuse = vec3(1, 0, 1);
-	pl->specular = vec3(1, 1, 1);
+	pl->diffuse = vec3(0.25f, 0, 0.25f);
+	pl->specular = vec3(0.25f, 0.25f, 0.25f);
 
 	pl->gameObject = pointObject;
 	pointObject->components.push_back(pl);
 	pl->start();
+	//------------------------------------------------------------------------------
+
+	//------------------------------------------------------------------------------
+	GameObject* spotObject = new GameObject();
+
+	spotObject->transform->position = vec3(10, 0, -5);
+	spotObject->transform->forward = glm::normalize(vec3(0.1f, 0.0f, 0.9f));
+	spotObject->transform->onTransformUpdate();
+
+	SpotLight* sl = new SpotLight(&SHL->spotLightPipe, &postRender.m_targets[1], &postRender.m_targets[2], &postRender.m_targets[3], &postRender.m_targets[4]);
+	
+	sl->position = vec3(0, 0, 0);
+	sl->direction = vec3(0, 0, 1);
+	sl->range = 15.0f;
+	sl->minCone = 0.1f;
+	sl->maxCone = 0.11f;
+	sl->diffuse = vec3(0.5f, 0, 0);
+	sl->specular = vec3(0.5f, 0.5f, 0.5f);
+
+	sl->gameObject = spotObject;
+	spotObject->components.push_back(sl);
+	sl->start();
 	//------------------------------------------------------------------------------
 
 	scene->gameObjects.push_back(cameraObject);
@@ -306,6 +332,7 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	scene->gameObjects.push_back(compGO);
 	scene->gameObjects.push_back(directionObject);
 	scene->gameObjects.push_back(pointObject);
+	scene->gameObjects.push_back(spotObject);
 
 	INP->setCursorLockMode(ECursorLock::NONE);
 

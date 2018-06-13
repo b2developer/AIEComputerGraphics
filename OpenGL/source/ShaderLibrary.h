@@ -37,6 +37,7 @@ public:
 
 	ShaderProgram directionalLightPipe;
 	ShaderProgram pointLightPipe;
+	ShaderProgram spotLightPipe;
 
 	ShaderProgram compositePassPipe;
 

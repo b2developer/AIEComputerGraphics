@@ -5,6 +5,7 @@
 #include <functional>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <glm/geometric.hpp>
 
 using namespace std;
 using namespace glm;

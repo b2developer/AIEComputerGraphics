@@ -84,6 +84,9 @@
     <ClCompile Include="source\PointLight.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
+    <ClCompile Include="source\SpotLight.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Gizmos.h">
@@ -150,6 +153,9 @@
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="source\PointLight.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="source\SpotLight.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
   </ItemGroup>

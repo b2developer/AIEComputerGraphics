@@ -165,6 +165,7 @@
     <ClCompile Include="source\Scene.cpp" />
     <ClCompile Include="source\Shader.cpp" />
     <ClCompile Include="source\ShaderLibrary.cpp" />
+    <ClCompile Include="source\SpotLight.cpp" />
     <ClCompile Include="source\Texture.cpp" />
     <ClCompile Include="source\Transform.cpp" />
   </ItemGroup>
@@ -188,6 +189,7 @@
     <ClInclude Include="source\Scene.h" />
     <ClInclude Include="source\Shader.h" />
     <ClInclude Include="source\ShaderLibrary.h" />
+    <ClInclude Include="source\SpotLight.h" />
     <ClInclude Include="source\Texture.h" />
     <ClInclude Include="source\tiny_obj_loader.h" />
     <ClInclude Include="source\Transform.h" />

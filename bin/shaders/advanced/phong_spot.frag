@@ -1,11 +1,15 @@
 //phong shader
 #version 410 
 
-//point light information
+//spot light information
 uniform vec3 lightPosition;
+uniform vec3 lightDirection;
 uniform vec3 lightDiffuse;
 uniform vec3 lightSpecular;
-uniform float radius;
+
+uniform float range;
+uniform float minCone;
+uniform float maxCone;
 
 uniform vec3 cameraPosition;
 
@@ -40,10 +44,20 @@ void main()
 		
 		vec3 toLight = lightPosition - position;
 		
-		float falloff = 1 - min(1, length(toLight) / radius);
+		float falloff = 1 - min(1, length(toLight) / range);
 		
 		vec3 L = normalize(toLight);
 		
+		float angleDot = dot(L, lightDirection);
+		float minDot = sin(minCone * 0.5f);
+		float maxDot = sin(maxCone * 0.5f);
+		
+		//calculate angle falloff
+		float d = 1 - angleDot;
+		float s = max(d, minDot) - minDot;
+		float sc = s / maxDot;
+		float angleFalloff = max(1 - sc, 0);
+	
 		float lambertTerm = max(0, min(1, dot(N, L)));
 		
 		//relative vector from the fragment position to the camera
@@ -57,8 +71,8 @@ void main()
 		
 		float specularTerm = pow(max(0, dot(R,V)), specularPower);
 		
-		lightOutput = lightDiffuse.rgb * lambertTerm * falloff;
-		specularOutput = lightSpecular.rgb * specular.rgb * specularTerm * falloff;	
+		lightOutput = lightDiffuse.rgb * lambertTerm * falloff * angleFalloff;
+		specularOutput = lightSpecular.rgb * specular.rgb * specularTerm * falloff * angleFalloff;	
 	}
 }
 

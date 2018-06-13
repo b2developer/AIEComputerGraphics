@@ -10,15 +10,15 @@ using namespace glm;
 using namespace aie;
 
 /*
-* class PointLight
+* class SpotLight
 * child class of Component
 *
 * a component that takes various G-Pass buffers and creates
-* colour for a light with a specific location and falloff in the L-Pass
+* colour for a light with a specific direction, cone and range
 *
 * @author: Bradley Booth, Academy of Interactive Entertainment, 2018
 */
-class PointLight : public Component
+class SpotLight : public Component
 {
 public:
 
@@ -30,7 +30,10 @@ public:
 	Texture * specularPowerBuffer = nullptr;
 
 	vec3 position;
-	float radius;
+	vec3 direction;
+	float range;
+	float minCone;
+	float maxCone;
 	vec3 diffuse;
 	vec3 specular;
 
@@ -43,7 +46,7 @@ public:
 	unsigned int ibo = 0; //index buffer object
 
 	/*
-	* PointLight()
+	* SpotLight()
 	* constructor, assigns normal buffer
 	*
 	* @param ShaderProgram* lightShader - shader that renders the light
@@ -52,13 +55,13 @@ public:
 	* @param Texture* specularBuffer - specular colour information
 	* @param Texture* specularPowerBuffer - the specular power
 	*/
-	PointLight(ShaderProgram* lightShader, Texture* positionBuffer, Texture* normalBuffer, Texture* specularBuffer, Texture* specularPowerBuffer);
+	SpotLight(ShaderProgram* lightShader, Texture* positionBuffer, Texture* normalBuffer, Texture* specularBuffer, Texture* specularPowerBuffer);
 
 	/*
-	* ~PointLight()
+	* ~SpotLight()
 	* destructor, deinitialises all vertex arrays and other buffers
 	*/
-	~PointLight();
+	~SpotLight();
 
 	/*
 	* start
