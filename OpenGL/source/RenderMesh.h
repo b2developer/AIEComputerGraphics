@@ -1,5 +1,5 @@
 #pragma once
-#include "Component.h"
+#include "Renderable.h"
 #include "Texture.h"
 
 #include <glm/glm.hpp>
@@ -10,14 +10,14 @@ using namespace aie;
 
 /*
 * class RenderMesh
-* child class of Component
+* child class of Renderable
 *
 * a mesh that ignores it's transform and always takes up the full portion
 * of the screen, this can be used with render targets to create post-processing effects
 *
 * @author: Bradley Booth, Academy of Interactive Entertainment, 2018
 */
-class RenderMesh : public Component
+class RenderMesh : public Renderable
 {
 public:
 
@@ -63,7 +63,7 @@ public:
 
 	/*
 	* start
-	* overrides Component's start()
+	* overrides Renderable's start()
 	*
 	* called when the object is created
 	*
@@ -82,7 +82,7 @@ public:
 
 	/*
 	* update
-	* overrides Component's update(float deltaTime)
+	* overrides Renderable's update(float deltaTime)
 	*
 	* called once per frame
 	*
@@ -93,7 +93,7 @@ public:
 
 	/*
 	* draw
-	* overrides Component's draw()
+	* overrides Renderable's draw()
 	*
 	* called once per frame after the update loop
 	*

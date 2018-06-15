@@ -1,4 +1,4 @@
-//gets the colour of the texture
+//deferred shader
 #version 410 
  
 in vec4 position;

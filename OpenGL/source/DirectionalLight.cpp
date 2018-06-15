@@ -78,6 +78,8 @@ void DirectionalLight::draw(Camera* camera, ERenderType renderType)
 	{		
 		lightShader->bind();
 
+		lightShader->bindUniform("lightType", 0);
+
 		lightShader->bindUniform("position", vec2(0, 0));
 		lightShader->bindUniform("scale", vec2(1, 1));
 		lightShader->bindUniform("depth", 0.0f);

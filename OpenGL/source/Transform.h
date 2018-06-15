@@ -93,3 +93,15 @@ public:
 	*/
 	void draw(Camera* camera, ERenderType renderType) override {}
 };
+
+/*
+* lookAtMatrix
+*
+* generates a matrix with translation = position, rotation = forward and up
+*
+* @param vec3 inPosition - the translation the matrix applies
+* @param vec3 inForward - controls pitch and yaw
+* @param vec3 inUp - controls roll
+* @returns mat4 - the completed matrix
+*/
+mat4 lookAtMatrix(vec3 inPosition, vec3 inForward, vec3 inUp);

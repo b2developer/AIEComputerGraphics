@@ -1,5 +1,5 @@
 #pragma once
-#include "Component.h"
+#include "Light.h"
 #include "Texture.h"
 #include "Shader.h"
 
@@ -11,14 +11,14 @@ using namespace aie;
 
 /*
 * class SpotLight
-* child class of Component
+* child class of Light
 *
 * a component that takes various G-Pass buffers and creates
 * colour for a light with a specific direction, cone and range
 *
 * @author: Bradley Booth, Academy of Interactive Entertainment, 2018
 */
-class SpotLight : public Component
+class SpotLight : public Light
 {
 public:
 
@@ -65,7 +65,7 @@ public:
 
 	/*
 	* start
-	* overrides Component's start()
+	* overrides Light's start()
 	*
 	* called when the object is created
 	*
@@ -85,7 +85,7 @@ public:
 
 	/*
 	* draw
-	* overrides Component's draw()
+	* overrides Light's draw()
 	*
 	* called once per frame after the update loop
 	*

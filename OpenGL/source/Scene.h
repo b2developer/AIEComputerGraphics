@@ -14,6 +14,8 @@ using namespace aie;
 
 //forward declarations
 class GameObject;
+class Light;
+class Renderable;
 
 /*
 * class Scene
@@ -67,4 +69,22 @@ public:
 	* @returns void
 	*/
 	void draw(GameObject* camera, ERenderType renderType);
+
+	/*
+	* sortComponents
+	*
+	* sorts all components into lists 
+	* to optimise the rendering process
+	*
+	* @returns void
+	*/
+	void sortComponents();
+
+private:
+
+	//sub-lists to sort to
+	vector<Renderable*> meshes;
+	vector<Renderable*> renderMeshes;
+	vector<Light*> lights;
+
 };

@@ -1,5 +1,5 @@
 #pragma once
-#include "Component.h"
+#include "Renderable.h"
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -14,7 +14,7 @@
 namespace aie {
 
 // a simple triangle mesh wrapper
-class OBJMesh : public Component
+class OBJMesh : public Renderable
 {
 public:
 
@@ -61,7 +61,7 @@ public:
 
 	/*
 	* start
-	* overrides Component's start()
+	* overrides Renderable's start()
 	*
 	* called when the object is created
 	*
@@ -71,7 +71,7 @@ public:
 
 	/*
 	* update
-	* overrides Component's update(float deltaTime)
+	* overrides Renderable's update(float deltaTime)
 	*
 	* called once per frame
 	*

@@ -158,5 +158,11 @@
     <ClInclude Include="source\SpotLight.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
+    <ClInclude Include="source\Renderable.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Light.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

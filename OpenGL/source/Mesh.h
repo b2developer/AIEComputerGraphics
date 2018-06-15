@@ -1,5 +1,5 @@
 #pragma once
-#include "Component.h"
+#include "Renderable.h"
 #include "Texture.h"
 
 #include <glm/glm.hpp>
@@ -10,7 +10,7 @@ using namespace aie;
 
 /*
 * class Mesh
-* child class of Component
+* child class of Renderable
 *
 * a collection of vertices that create the surfaces of a 3D model
 *
@@ -54,7 +54,7 @@ public:
 
 	/*
 	* start
-	* overrides Component's start()
+	* overrides Renderable's start()
 	*
 	* called when the object is created
 	*
@@ -87,7 +87,7 @@ public:
 
 	/*
 	* update
-	* overrides Component's update(float deltaTime)
+	* overrides Renderable's update(float deltaTime)
 	*
 	* called once per frame
 	*
@@ -98,7 +98,7 @@ public:
 
 	/*
 	* draw
-	* overrides Component's draw()
+	* overrides Renderable's draw()
 	*
 	* called once per frame after the update loop
 	*

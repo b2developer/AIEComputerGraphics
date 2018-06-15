@@ -170,7 +170,7 @@ void Mesh::draw(Camera* camera, ERenderType renderType)
 		SHL->gPassPipe.bindUniform("ModelMatrix", gameObject->transform->translationMatrix);
 
 		//create the normal matrix (rotation matrix of the model)
-		mat3 nm = glm::lookAt(vec3(0, 0, 0), gameObject->transform->forward, vec3(0, 1, 0));
+		mat3 nm = lookAtMatrix(vec3(0, 0, 0), gameObject->transform->forward, gameObject->transform->up);
 		SHL->gPassPipe.bindUniform("NormalMatrix", nm);
 
 		SHL->gPassPipe.bindUniform("Kd", vec3(1, 1, 1));

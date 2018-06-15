@@ -180,9 +180,11 @@
     <ClInclude Include="source\gl_core_4_4.h" />
     <ClInclude Include="source\Input.h" />
     <ClInclude Include="source\InputCallbacks.h" />
+    <ClInclude Include="source\Light.h" />
     <ClInclude Include="source\Mesh.h" />
     <ClInclude Include="source\OBJMesh.h" />
     <ClInclude Include="source\PointLight.h" />
+    <ClInclude Include="source\Renderable.h" />
     <ClInclude Include="source\RenderMesh.h" />
     <ClInclude Include="source\RenderTarget.h" />
     <ClInclude Include="source\RenderType.h" />

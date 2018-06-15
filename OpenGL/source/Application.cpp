@@ -105,13 +105,13 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	SHL->gPassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/gpass.frag").c_str());
 
 	SHL->directionalLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
-	SHL->directionalLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/brdf.frag").c_str());
+	SHL->directionalLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/lpass_brdf.frag").c_str());
 
 	SHL->pointLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/light.vert").c_str());
-	SHL->pointLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/brdf_point.frag").c_str());
+	SHL->pointLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/lpass_brdf.frag").c_str());
 
 	SHL->spotLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/light.vert").c_str());
-	SHL->spotLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/brdf_spot.frag").c_str());
+	SHL->spotLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/lpass_brdf.frag").c_str());
 
 	SHL->compositePassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
 	SHL->compositePassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/composite.frag").c_str());
@@ -121,8 +121,8 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 
 	//colour formats for render textures
 	Texture::Format formatting[8] = { Texture::Format::RGB8, Texture::Format::RGB32, Texture::Format::RGB32, Texture::Format::RGB32, Texture::Format::RED,	//post render
-									  Texture::Format::RGBA, Texture::Format::RGB32,																		//light render
-									  Texture::Format::RGBA};																								//composite render
+									  Texture::Format::RGB32, Texture::Format::RGB32,																		//light render
+									  Texture::Format::RGB32};																								//composite render
 
 
 	//check render target initialised properly
@@ -333,6 +333,8 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	scene->gameObjects.push_back(directionObject);
 	scene->gameObjects.push_back(pointObject);
 	scene->gameObjects.push_back(spotObject);
+
+	scene->sortComponents();
 
 	INP->setCursorLockMode(ECursorLock::NONE);
 

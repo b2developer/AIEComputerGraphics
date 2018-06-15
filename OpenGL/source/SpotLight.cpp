@@ -90,13 +90,15 @@ void SpotLight::draw(Camera* camera, ERenderType renderType)
 
 		lightShader->bind();
 
+		lightShader->bindUniform("lightType", 2);
+
 		lightShader->bindUniform("cameraPosition", camera->gameObject->transform->position);
 
 		auto pvm = camera->viewMatrix * gameObject->transform->translationMatrix;
 		lightShader->bindUniform("ProjectionViewModel", pvm);
 
 		//create the normal matrix (rotation matrix of the model)
-		mat3 nm = glm::lookAt(vec3(0, 0, 0), gameObject->transform->forward, vec3(0, 1, 0));
+		mat3 nm = lookAtMatrix(vec3(0, 0, 0), gameObject->transform->forward, gameObject->transform->up);
 
 		//rotatated light position
 		vec3 nlp = position * nm;
