@@ -160,6 +160,7 @@
     <ClCompile Include="source\Mesh.cpp" />
     <ClCompile Include="source\OBJMesh.cpp" />
     <ClCompile Include="source\PointLight.cpp" />
+    <ClCompile Include="source\Renderable.cpp" />
     <ClCompile Include="source\RenderMesh.cpp" />
     <ClCompile Include="source\RenderTarget.cpp" />
     <ClCompile Include="source\Scene.cpp" />

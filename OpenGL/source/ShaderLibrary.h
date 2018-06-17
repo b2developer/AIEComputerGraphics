@@ -32,14 +32,16 @@ private:
 
 public: 
 
-	ShaderProgram postProcessingPipe;
 	ShaderProgram gPassPipe;
+	ShaderProgram tPassPipe;
 
 	ShaderProgram directionalLightPipe;
 	ShaderProgram pointLightPipe;
 	ShaderProgram spotLightPipe;
 
 	ShaderProgram compositePassPipe;
+
+	ShaderProgram postProcessingPipe;
 
 	/*
 	* getInstance

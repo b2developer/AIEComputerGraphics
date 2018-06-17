@@ -22,8 +22,6 @@ class DirectionalLight : public Light
 {
 public:
 
-	ShaderProgram * lightShader = nullptr;
-
 	Texture * positionBuffer = nullptr;
 	Texture * normalBuffer = nullptr;
 	Texture * specularBuffer = nullptr;
@@ -45,13 +43,12 @@ public:
 	* DirectionalLight()
 	* constructor, assigns normal buffer
 	*
-	* @param ShaderProgram* lightShader - shader that renders the light
 	* @param Texture* positionBuffer - positional information
 	* @param Texture* normalBuffer - normal information
 	* @param Texture* specularBuffer - specular colour information
 	* @param Texture* specularPowerBuffer - the specular power
 	*/
-	DirectionalLight(ShaderProgram* lightShader, Texture* positionBuffer, Texture* normalBuffer, Texture* specularBuffer, Texture* specularPowerBuffer);
+	DirectionalLight(Texture* positionBuffer, Texture* normalBuffer, Texture* specularBuffer, Texture* specularPowerBuffer);
 
 	/*
 	* ~DirectionalLight()
@@ -90,4 +87,15 @@ public:
 	* @returns void
 	*/
 	void draw(Camera* camera, ERenderType renderType) override;
+
+	/*
+	* bindLight
+	* overrides Light's bindLight(int position)
+	*
+	* assigns all of it's properties to the appropriate array in shader memory
+	*
+	* @param int pos - the position of the array to assign to
+	* @returns void
+	*/
+	void bindLight(int pos) override;
 };

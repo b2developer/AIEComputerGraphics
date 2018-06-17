@@ -16,7 +16,7 @@ using namespace aie;
 *
 * @author: Bradley Booth, Academy of Interactive Entertainment, 2018
 */
-class Mesh : public Component
+class Mesh : public Renderable
 {
 public:
 
@@ -84,17 +84,6 @@ public:
 	* @returns void
 	*/
 	void initialise(unsigned int vertexCount, const Vertex* vertices, unsigned int indexCount = 0, unsigned int* indices = nullptr);
-
-	/*
-	* update
-	* overrides Renderable's update(float deltaTime)
-	*
-	* called once per frame
-	*
-	* @param float deltaTime - amount of time passed since the last frame
-	* @returns void
-	*/
-	void update(float deltaTime) override {}
 
 	/*
 	* draw

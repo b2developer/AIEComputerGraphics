@@ -89,6 +89,8 @@ void RenderMesh::draw(Camera* camera, ERenderType renderType)
 
 		SHL->postProcessingPipe.bindUniform("displayTexture", 0);
 
+		SHL->postProcessingPipe.bindUniform("exposure", 2.0f);
+
 		texture->bind(0);
 	}
 	else if (renderType == renderingType && renderType == ERenderType::COMPOSITE_PASS)
@@ -99,9 +101,12 @@ void RenderMesh::draw(Camera* camera, ERenderType renderType)
 		SHL->compositePassPipe.bindUniform("scale", scale);
 		SHL->compositePassPipe.bindUniform("depth", depth);
 
+		SHL->compositePassPipe.bindUniform("ambientTexture", 5);
 		SHL->compositePassPipe.bindUniform("albedoTexture", 0);
 		SHL->compositePassPipe.bindUniform("lightTexture", 1);
 		SHL->compositePassPipe.bindUniform("specularTexture", 2);
+		SHL->compositePassPipe.bindUniform("transparentTexture", 3);
+		SHL->compositePassPipe.bindUniform("blendTexture", 4);
 
 		if (buffer1 != nullptr)
 		{
@@ -116,6 +121,21 @@ void RenderMesh::draw(Camera* camera, ERenderType renderType)
 		if (buffer3 != nullptr)
 		{
 			buffer3->bind(2);
+		}
+
+		if (buffer4 != nullptr)
+		{
+			buffer4->bind(3);
+		}
+
+		if (buffer5 != nullptr)
+		{
+			buffer5->bind(4);
+		}
+
+		if (buffer6 != nullptr)
+		{
+			buffer6->bind(5);
 		}
 	}
 	else

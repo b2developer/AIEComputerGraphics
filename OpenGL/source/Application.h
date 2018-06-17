@@ -46,9 +46,10 @@ public:
 	Texture* texture;
 	Texture* texture2;
 
-	RenderTarget postRender;
+	RenderTarget gRender;
 	RenderTarget lightRender;
 	RenderTarget compRender;
+	RenderTarget transRender;
 
 	/*
 	* Application()
@@ -74,6 +75,15 @@ public:
 	* @returns bool - startup attempt result, true means the application can load
 	*/
 	bool startup(unsigned int width, unsigned int height, const char windowName[MAX_NAME]);
+
+	/*
+	* setupScene
+	*
+	* creates a scene with several game-objects that demonstrate the rendering engine
+	*
+	* @returns bool - indicator of the scene seting up correctly
+	*/
+	bool setupScene();
 
 	/*
 	* shutdown
@@ -102,9 +112,10 @@ public:
 	* and fills the screen with a solid colour
 	*
 	* @param vec4 colour - the colour to fill the screen with
+	* @param bool depthClear - flag indicating whether the depth buffer should be cleared
 	* @returns void
 	*/
-	void clearScreen(vec4 colour);
+	void clearScreen(vec4 colour, bool depthClear = true);
 
 	/*
 	* draw

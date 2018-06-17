@@ -9,8 +9,8 @@
 #include "ShaderLibrary.h"
 
 //constructor
-DirectionalLight::DirectionalLight(ShaderProgram* inLightShader, Texture* inPosition, Texture* inNormal, Texture* inSpecular, Texture* inSpecularP) : lightShader(inLightShader), positionBuffer(inPosition),
-																																					  normalBuffer(inNormal), specularBuffer(inSpecular), specularPowerBuffer(inSpecularP)
+DirectionalLight::DirectionalLight(Texture* inPosition, Texture* inNormal, Texture* inSpecular, Texture* inSpecularP) : positionBuffer(inPosition),
+																														normalBuffer(inNormal), specularBuffer(inSpecular), specularPowerBuffer(inSpecularP)
 {
 	
 }
@@ -76,24 +76,24 @@ void DirectionalLight::draw(Camera* camera, ERenderType renderType)
 {
 	if (renderType == ERenderType::LIGHTING_PASS)
 	{		
-		lightShader->bind();
+		deferredShader->bind();
 
-		lightShader->bindUniform("lightType", 0);
+		deferredShader->bindUniform("lightType", 0);
 
-		lightShader->bindUniform("position", vec2(0, 0));
-		lightShader->bindUniform("scale", vec2(1, 1));
-		lightShader->bindUniform("depth", 0.0f);
+		deferredShader->bindUniform("position", vec2(0, 0));
+		deferredShader->bindUniform("scale", vec2(1, 1));
+		deferredShader->bindUniform("depth", 0.0f);
 
-		lightShader->bindUniform("cameraPosition", camera->gameObject->transform->position);
+		deferredShader->bindUniform("cameraPosition", camera->gameObject->transform->position);
 
-		lightShader->bindUniform("lightDirection", direction);
-		lightShader->bindUniform("lightDiffuse", diffuse);
-		lightShader->bindUniform("lightSpecular", specular);
+		deferredShader->bindUniform("lightDirection", direction);
+		deferredShader->bindUniform("lightDiffuse", diffuse);
+		deferredShader->bindUniform("lightSpecular", specular);
 
-		lightShader->bindUniform("positionTexture", 0);
-		lightShader->bindUniform("normalTexture", 1);
-		lightShader->bindUniform("specularTexture", 2);
-		lightShader->bindUniform("specularPowerTexture", 3);
+		deferredShader->bindUniform("positionTexture", 0);
+		deferredShader->bindUniform("normalTexture", 1);
+		deferredShader->bindUniform("specularTexture", 2);
+		deferredShader->bindUniform("specularPowerTexture", 3);
 
 		positionBuffer->bind(0);
 		normalBuffer->bind(1);
@@ -118,4 +118,23 @@ void DirectionalLight::draw(Camera* camera, ERenderType renderType)
 		//draw vertices as if they are ordered as triangles
 		glDrawArrays(GL_TRIANGLES, 0, 3 * triCount);
 	}
+}
+
+//assigns in-shader properties to an array for this light
+void DirectionalLight::bindLight(int pos)
+{
+	string header = "lights[" + to_string(pos) + "].";
+
+	string targetString = header + "lightType";
+	forwardShader->bindUniform(targetString.c_str(), 0);
+
+	targetString = header + "lightDirection";
+	forwardShader->bindUniform(targetString.c_str(), direction);
+
+	targetString = header + "lightDiffuse";
+	forwardShader->bindUniform(targetString.c_str(), diffuse);
+
+	targetString = header + "lightSpecular";
+	forwardShader->bindUniform(targetString.c_str(), specular);
+
 }

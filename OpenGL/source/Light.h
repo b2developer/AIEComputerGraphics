@@ -1,5 +1,11 @@
 #pragma once
 #include "Component.h"
+#include "Shader.h"
+
+//must match the same const int in shaders
+const int MAX_LIGHTS = 24;
+
+using namespace aie;
 
 /*
 * class Light
@@ -12,6 +18,9 @@
 class Light : public Component
 {
 public:
+
+	ShaderProgram * deferredShader = nullptr;
+	ShaderProgram * forwardShader = nullptr;
 
 	/*
 	* Light()
@@ -60,4 +69,15 @@ public:
 	* @returns void
 	*/
 	virtual void draw(Camera* camera, ERenderType renderType) override {};
+
+	/*
+	* bindLight
+	* virtual function
+	*
+	* assigns all of it's properties to the appropriate array in shader memory
+	*
+	* @param int pos - the position of the array to assign to 
+	* @returns void
+	*/
+	virtual void bindLight(int pos) {};
 };

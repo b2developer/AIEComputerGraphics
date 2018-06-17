@@ -160,6 +160,7 @@ void Mesh::draw(Camera* camera, ERenderType renderType)
 		SHL->gPassPipe.bind();
 
 		SHL->gPassPipe.bindUniform("useTexture", 1);
+		SHL->gPassPipe.bindUniform("useAmbientTexture", 0);
 		SHL->gPassPipe.bindUniform("useNormalTexture", 0);
 		SHL->gPassPipe.bindUniform("useSpecularTexture", 0);
 
@@ -173,11 +174,41 @@ void Mesh::draw(Camera* camera, ERenderType renderType)
 		mat3 nm = lookAtMatrix(vec3(0, 0, 0), gameObject->transform->forward, gameObject->transform->up);
 		SHL->gPassPipe.bindUniform("NormalMatrix", nm);
 
+		SHL->gPassPipe.bindUniform("Ka", vec3(0, 0, 0));
 		SHL->gPassPipe.bindUniform("Kd", vec3(1, 1, 1));
 		SHL->gPassPipe.bindUniform("Ks", vec3(0, 0, 0));
 		SHL->gPassPipe.bindUniform("specularPower", 0.0f);
 
 		SHL->gPassPipe.bindUniform("diffuseTexture", 0);
+
+		texture->bind(0);
+	}
+	else if (renderType == ERenderType::T_PASS)
+	{
+		SHL->tPassPipe.bind();
+
+		SHL->tPassPipe.bindUniform("useTexture", 1);
+		SHL->tPassPipe.bindUniform("useAmbientTexture", 0);
+		SHL->tPassPipe.bindUniform("useNormalTexture", 0);
+		SHL->tPassPipe.bindUniform("useSpecularTexture", 0);
+		SHL->tPassPipe.bindUniform("useAlphaTexture", 0);
+
+		//create all neccessary matrice
+		auto pvm = camera->viewMatrix * gameObject->transform->translationMatrix;
+
+		SHL->tPassPipe.bindUniform("ProjectionViewModel", pvm);
+		SHL->tPassPipe.bindUniform("ModelMatrix", gameObject->transform->translationMatrix);
+
+		//create the normal matrix (rotation matrix of the model)
+		mat3 nm = lookAtMatrix(vec3(0, 0, 0), gameObject->transform->forward, gameObject->transform->up);
+		SHL->tPassPipe.bindUniform("NormalMatrix", nm);
+
+		SHL->tPassPipe.bindUniform("Ka", vec3(0, 0, 0));
+		SHL->tPassPipe.bindUniform("Kd", vec3(1, 1, 1));
+		SHL->tPassPipe.bindUniform("Ks", vec3(0, 0, 0));
+		SHL->tPassPipe.bindUniform("specularPower", 0.0f);
+
+		SHL->tPassPipe.bindUniform("diffuseTexture", 0);
 
 		texture->bind(0);
 	}

@@ -47,4 +47,9 @@ void ShaderLibrary::linkShaders()
 	{
 		std::cout << "Shader Error (Composite Shader): " << '\n' << compositePassPipe.getLastError() << '\n';
 	}
+
+	if (tPassPipe.link() == false)
+	{
+		std::cout << "Shader Error (T-Pass Shader): " << '\n' << tPassPipe.getLastError() << '\n';
+	}
 }

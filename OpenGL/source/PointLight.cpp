@@ -9,8 +9,8 @@
 #include "ShaderLibrary.h"
 
 //constructor
-PointLight::PointLight(ShaderProgram* inLightShader, Texture* inPosition, Texture* inNormal, Texture* inSpecular, Texture* inSpecularP) : lightShader(inLightShader), positionBuffer(inPosition),
-																																		  normalBuffer(inNormal), specularBuffer(inSpecular), specularPowerBuffer(inSpecularP)
+PointLight::PointLight(Texture* inPosition, Texture* inNormal, Texture* inSpecular, Texture* inSpecularP) : positionBuffer(inPosition),
+																											normalBuffer(inNormal), specularBuffer(inSpecular), specularPowerBuffer(inSpecularP)
 {
 	
 }
@@ -88,14 +88,14 @@ void PointLight::draw(Camera* camera, ERenderType renderType)
 	{
 		glCullFace(GL_FRONT);
 
-		lightShader->bind();
+		deferredShader->bind();
 
-		lightShader->bindUniform("lightType", 1);
+		deferredShader->bindUniform("lightType", 1);
 
-		lightShader->bindUniform("cameraPosition", camera->gameObject->transform->position);
+		deferredShader->bindUniform("cameraPosition", camera->gameObject->transform->position);
 
 		auto pvm = camera->viewMatrix * gameObject->transform->translationMatrix;
-		lightShader->bindUniform("ProjectionViewModel", pvm);
+		deferredShader->bindUniform("ProjectionViewModel", pvm);
 
 		//create the normal matrix (rotation matrix of the model)
 		mat3 nm = lookAtMatrix(vec3(0, 0, 0), gameObject->transform->forward, gameObject->transform->up);
@@ -103,16 +103,16 @@ void PointLight::draw(Camera* camera, ERenderType renderType)
 		//rotatated light position
 		vec3 nlp = position * nm;
 
-		lightShader->bindUniform("scale", vec3(radius, radius, radius) * 2.0f);
-		lightShader->bindUniform("lightPosition", gameObject->transform->position + nlp);
-		lightShader->bindUniform("lightDiffuse", diffuse);
-		lightShader->bindUniform("lightSpecular", specular);
-		lightShader->bindUniform("range", radius);
+		deferredShader->bindUniform("scale", vec3(radius, radius, radius) * 2.0f);
+		deferredShader->bindUniform("lightPosition", gameObject->transform->position + nlp);
+		deferredShader->bindUniform("lightDiffuse", diffuse);
+		deferredShader->bindUniform("lightSpecular", specular);
+		deferredShader->bindUniform("range", radius);
 
-		lightShader->bindUniform("positionTexture", 0);
-		lightShader->bindUniform("normalTexture", 1);
-		lightShader->bindUniform("specularTexture", 2);
-		lightShader->bindUniform("specularPowerTexture", 3);
+		deferredShader->bindUniform("positionTexture", 0);
+		deferredShader->bindUniform("normalTexture", 1);
+		deferredShader->bindUniform("specularTexture", 2);
+		deferredShader->bindUniform("specularPowerTexture", 3);
 
 		positionBuffer->bind(0);
 		normalBuffer->bind(1);
@@ -139,4 +139,32 @@ void PointLight::draw(Camera* camera, ERenderType renderType)
 	}
 
 	glCullFace(GL_BACK);
+}
+
+//assigns in-shader properties to an array for this light
+void PointLight::bindLight(int pos)
+{
+	string header = "lights[" + to_string(pos) + "].";
+
+	string targetString = header + "lightType";
+	forwardShader->bindUniform(targetString.c_str(), 1);
+
+	//create the normal matrix (rotation matrix of the model)
+	mat3 nm = lookAtMatrix(vec3(0, 0, 0), gameObject->transform->forward, gameObject->transform->up);
+
+	//rotatated light position
+	vec3 nlp = position * nm;
+
+	targetString = header + "lightPosition";
+	forwardShader->bindUniform(targetString.c_str(), nlp);
+
+	targetString = header + "lightDiffuse";
+	forwardShader->bindUniform(targetString.c_str(), diffuse);
+
+	targetString = header + "lightSpecular";
+	forwardShader->bindUniform(targetString.c_str(), specular);
+
+	targetString = header + "range";
+	forwardShader->bindUniform(targetString.c_str(), radius);
+
 }

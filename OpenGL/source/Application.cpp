@@ -98,48 +98,65 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 
 	//load essential shaders for lighting
 	//------------------------------------------------------------------------------
-	SHL->postProcessingPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
-	SHL->postProcessingPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/post.frag").c_str());
+	SHL->postProcessingPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/post.vert").c_str());
+	SHL->postProcessingPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/post.frag").c_str());
 
-	SHL->gPassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/standard.vert").c_str());
-	SHL->gPassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/gpass.frag").c_str());
+	SHL->gPassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/standard.vert").c_str());
+	SHL->gPassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/gpass.frag").c_str());
 
-	SHL->directionalLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
-	SHL->directionalLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/lpass_brdf.frag").c_str());
+	SHL->directionalLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/post.vert").c_str());
+	SHL->directionalLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/lpass_brdf.frag").c_str());
 
-	SHL->pointLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/light.vert").c_str());
-	SHL->pointLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/lpass_brdf.frag").c_str());
+	SHL->pointLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/light.vert").c_str());
+	SHL->pointLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/lpass_brdf.frag").c_str());
 
-	SHL->spotLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/light.vert").c_str());
-	SHL->spotLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/lpass_brdf.frag").c_str());
+	SHL->spotLightPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/light.vert").c_str());
+	SHL->spotLightPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/lpass_brdf.frag").c_str());
 
-	SHL->compositePassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/advanced/post.vert").c_str());
-	SHL->compositePassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/advanced/composite.frag").c_str());
+	SHL->compositePassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/post.vert").c_str());
+	SHL->compositePassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/composite.frag").c_str());
+
+	SHL->tPassPipe.loadShader(aie::eShaderStage::VERTEX, std::string(rootFolder + "/shaders/standard.vert").c_str());
+	SHL->tPassPipe.loadShader(aie::eShaderStage::FRAGMENT, std::string(rootFolder + "/shaders/tpass_brdf.frag").c_str());
 
 	SHL->linkShaders();
 	//------------------------------------------------------------------------------
 
 	//colour formats for render textures
-	Texture::Format formatting[8] = { Texture::Format::RGB8, Texture::Format::RGB32, Texture::Format::RGB32, Texture::Format::RGB32, Texture::Format::RED,	//post render
-									  Texture::Format::RGB32, Texture::Format::RGB32,																		//light render
-									  Texture::Format::RGB32};																								//composite render
-
+	Texture::Format formatting[11] = { Texture::Format::RGB8, Texture::Format::RGB8, Texture::Format::RGB32, Texture::Format::RGB32, //post render
+									   Texture::Format::RGB32, Texture::Format::RED,Texture::Format::RGB8, Texture::Format::RED,	 //post render
+									   Texture::Format::RGB32, Texture::Format::RGB32,												 //light render
+									   Texture::Format::RGB32};																		 //composite render																		
 
 	//check render target initialised properly
-	if (postRender.initialise(5, width, height, formatting) == false)
+	if (gRender.initialise(8, width, height, formatting) == false)
 	{
 		return false;
 	}
 
-	if (lightRender.initialise(2, width, height, &formatting[5]) == false)
+	if (lightRender.initialise(2, width, height, &formatting[8]) == false)
 	{
 		return false;
 	}
 
-	if (compRender.initialise(1, width, height, &formatting[7]) == false)
+	if (compRender.initialise(1, width, height, &formatting[10]) == false)
 	{
 		return false;
 	}
+
+	if (setupScene() == false)
+	{
+		return false;
+	}
+
+	INP->setCursorLockMode(ECursorLock::NONE);
+
+	return true;
+}
+
+//generates a scene with gameobjects
+bool Application::setupScene()
+{
 
 	scene = new Scene();
 
@@ -163,41 +180,41 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	//------------------------------------------------------------------------------
 
 	//------------------------------------------------------------------------------
-	GameObject* meshObject = new GameObject();
+	GameObject* bunnyObject = new GameObject();
 
-	meshObject->transform->position = vec3(10, 5, 0);
-	meshObject->transform->onTransformUpdate();
+	bunnyObject->transform->position = vec3(10, 0, 0);
+	bunnyObject->transform->onTransformUpdate();
 
-	OBJMesh* mesh = new OBJMesh();
+	OBJMesh* bunnyMesh = new OBJMesh();
 
 	//mesh failed to load
-	if (mesh->load(std::string(rootFolder + "/models/Bunny.obj").c_str()) == false)
+	if (bunnyMesh->load(std::string(rootFolder + "/models/Bunny.obj").c_str()) == false)
 	{
 		return false;
 	}
 
-	mesh->gameObject = meshObject;
-	meshObject->components.push_back(mesh);
-	mesh->start();
+	bunnyMesh->gameObject = bunnyObject;
+	bunnyObject->components.push_back(bunnyMesh);
+	bunnyMesh->start();
 	//------------------------------------------------------------------------------
 
 	//------------------------------------------------------------------------------
-	GameObject* meshObject2 = new GameObject();
+	GameObject* dragonObject = new GameObject();
 
-	meshObject2->transform->position = vec3(-10, 5, 0);
-	meshObject2->transform->onTransformUpdate();
+	dragonObject->transform->position = vec3(-10, 0, 0);
+	dragonObject->transform->onTransformUpdate();
 
-	OBJMesh* mesh2 = new OBJMesh();
+	OBJMesh* dragonMesh = new OBJMesh();
 
 	//mesh failed to load
-	if (mesh2->load(std::string(rootFolder + "/models/Dragon.obj").c_str()) == false)
+	if (dragonMesh->load(std::string(rootFolder + "/models/Dragon.obj").c_str()) == false)
 	{
 		return false;
 	}
 
-	mesh2->gameObject = meshObject2;
-	meshObject2->components.push_back(mesh2);
-	mesh2->start();
+	dragonMesh->gameObject = dragonObject;
+	dragonObject->components.push_back(dragonMesh);
+	dragonMesh->start();
 	//------------------------------------------------------------------------------
 
 	//------------------------------------------------------------------------------
@@ -208,10 +225,10 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	{
 		return false;
 	}
-	
+
 	GameObject* quadObject = new GameObject();
 
-	quadObject->transform->position = vec3(0, -1, 0);
+	quadObject->transform->position = vec3(0, 0.0f, 0);
 	quadObject->transform->scale = vec3(3, 1, 3);
 	quadObject->transform->onTransformUpdate();
 
@@ -226,10 +243,10 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 
 	RenderMesh* lightRM = new RenderMesh(nullptr, vec2(1 - 0.333f, 1 - 0.666f), vec2(0.333f, 0.333f), 0.0f, ERenderType::LIGHTING_PASS);
 
-	lightRM->buffer1 = &postRender.m_targets[1];
-	lightRM->buffer2 = &postRender.m_targets[2];
-	lightRM->buffer3 = &postRender.m_targets[3];
-	lightRM->buffer4 = &postRender.m_targets[4];
+	lightRM->buffer1 = &gRender.m_targets[2];
+	lightRM->buffer2 = &gRender.m_targets[3];
+	lightRM->buffer3 = &gRender.m_targets[4];
+	lightRM->buffer4 = &gRender.m_targets[5];
 
 	lightRM->gameObject = lightGO;
 	lightGO->components.push_back(lightRM);
@@ -241,9 +258,12 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 
 	RenderMesh* compRM = new RenderMesh(&compRender.m_targets[0], vec2(0.0f, 0.0f), vec2(1.0f, 1.0f), 0.0f, ERenderType::COMPOSITE_PASS);
 
-	compRM->buffer1 = &postRender.m_targets[0];
+	compRM->buffer1 = &gRender.m_targets[1];
 	compRM->buffer2 = &lightRender.m_targets[0];
 	compRM->buffer3 = &lightRender.m_targets[1];
+	compRM->buffer4 = &gRender.m_targets[6];
+	compRM->buffer5 = &gRender.m_targets[7];
+	compRM->buffer6 = &gRender.m_targets[0];
 
 	compRM->gameObject = compGO;
 	compGO->components.push_back(compRM);
@@ -251,49 +271,240 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	//------------------------------------------------------------------------------
 
 	//------------------------------------------------------------------------------
-	GameObject* meshObject3 = new GameObject();
+	GameObject* soulspearObject = new GameObject();
 
-	meshObject3->transform->position = vec3(0, 5, 10);
-	meshObject3->transform->onTransformUpdate();
+	soulspearObject->transform->position = vec3(0, 0.0f, 10);
+	soulspearObject->transform->onTransformUpdate();
 
-	OBJMesh* mesh3 = new OBJMesh();
+	OBJMesh* soulspearMesh = new OBJMesh();
 
-	mesh3->useTexture = 1;
+	soulspearMesh->useTexture = 1;
+	soulspearMesh->useNormalTexture = 1;
+	soulspearMesh->useSpecularTexture = 1;
 
 	//mesh failed to load
-	if (mesh3->load(std::string(rootFolder + "/models/soulspear.obj").c_str(), true, true) == false)
+	if (soulspearMesh->load(std::string(rootFolder + "/models/soulspear.obj").c_str(), true, true) == false)
 	{
 		return false;
 	}
 
-	mesh3->gameObject = meshObject3;
-	meshObject3->components.push_back(mesh3);
-	mesh3->start();
+	soulspearMesh->gameObject = soulspearObject;
+	soulspearObject->components.push_back(soulspearMesh);
+	soulspearMesh->start();
+	//------------------------------------------------------------------------------
+
+	//------------------------------------------------------------------------------
+	GameObject* buddhaObject = new GameObject();
+
+	buddhaObject->transform->position = vec3(-10.0f, 0.0f, 10.0f);
+	buddhaObject->transform->forward = vec3(1.0f, 0.0f, 0.0f);
+	buddhaObject->transform->onTransformUpdate();
+
+	OBJMesh* buddhaMesh = new OBJMesh();
+
+	//mesh failed to load
+	if (buddhaMesh->load(std::string(rootFolder + "/models/Buddha.obj").c_str()) == false)
+	{
+		return false;
+	}
+
+	buddhaMesh->spin = true;
+	buddhaMesh->spinSpeed = 1.0f;
+
+	buddhaMesh->gameObject = buddhaObject;
+	buddhaObject->components.push_back(buddhaMesh);
+	buddhaMesh->start();
+	//------------------------------------------------------------------------------
+
+	//------------------------------------------------------------------------------
+	GameObject* lucyObject = new GameObject();
+
+	lucyObject->transform->position = vec3(10, 0.0f, 10);
+	lucyObject->transform->scale = vec3(0.5f, 0.5f, 0.5f);
+	lucyObject->transform->onTransformUpdate();
+
+	OBJMesh* lucyMesh = new OBJMesh();
+
+	//mesh failed to load
+	if (lucyMesh->load(std::string(rootFolder + "/models/Lucy.obj").c_str()) == false)
+	{
+		return false;
+	}
+
+	lucyMesh->gameObject = lucyObject;
+	lucyObject->components.push_back(lucyMesh);
+	lucyMesh->start();
+	//------------------------------------------------------------------------------
+
+	//------------------------------------------------------------------------------
+	GameObject* glassObject = new GameObject();
+
+	glassObject->transform->position = vec3(-5, 0.0f, 7.5f);
+	glassObject->transform->scale = vec3(2.0f, 2.0f, 2.0f);
+	glassObject->transform->onTransformUpdate();
+
+	OBJMesh* glassMesh = new OBJMesh();
+
+	//mesh failed to load
+	if (glassMesh->load(std::string(rootFolder + "/models/Glass.obj").c_str()) == false)
+	{
+		return false;
+	}
+
+	OBJMesh::Material mat;
+	mat.ambient = vec3(0.01f, 0, 0);
+	mat.diffuse = vec3(1, 0, 0);
+	mat.opacity = 0.6f;
+
+	glassMesh->usesAlpha = true;
+
+	glassMesh->m_materials.clear();
+	glassMesh->m_materials.push_back(mat);
+
+	glassMesh->gameObject = glassObject;
+	glassObject->components.push_back(glassMesh);
+	glassMesh->start();
+	//------------------------------------------------------------------------------
+
+	//------------------------------------------------------------------------------
+	GameObject* glassObject2 = new GameObject();
+
+	glassObject2->transform->position = vec3(10, 0.0f, 5);
+	glassObject2->transform->scale = vec3(2.0f, 2.0f, 2.0f);
+	glassObject2->transform->onTransformUpdate();
+
+	OBJMesh* glassMesh2 = new OBJMesh();
+
+	//mesh failed to load
+	if (glassMesh2->load(std::string(rootFolder + "/models/Glass.obj").c_str()) == false)
+	{
+		return false;
+	}
+
+	mat.ambient = vec3(0, 0.01f, 0);
+	mat.diffuse = vec3(0, 1, 0);
+	mat.specular = vec3(1, 1, 1);
+	mat.specularPower = 100.0f;
+	mat.opacity = 0.3f;
+
+	glassMesh2->usesAlpha = true;
+
+	glassMesh2->m_materials.clear();
+	glassMesh2->m_materials.push_back(mat);
+
+	glassMesh2->gameObject = glassObject2;
+	glassObject2->components.push_back(glassMesh2);
+	glassMesh2->start();
+	//------------------------------------------------------------------------------
+
+	//------------------------------------------------------------------------------
+	GameObject* earthObject = new GameObject();
+
+	earthObject->transform->position = vec3(0, 15.0f, 0);
+	earthObject->transform->scale = vec3(4.0f, 4.0f, 4.0f);
+	earthObject->transform->onTransformUpdate();
+
+	OBJMesh* earthMesh = new OBJMesh();
+
+	//mesh failed to load
+	if (earthMesh->load(std::string(rootFolder + "/models/sphere.obj").c_str()) == false)
+	{
+		return false;
+	}
+
+	earthMesh->useTexture = 1;
+	earthMesh->useAmbientTexture = 1;
+	earthMesh->useNormalTexture = 1;
+	earthMesh->useSpecularTexture = 1;
+	earthMesh->spin = true;
+	earthMesh->spinSpeed = 1.0f;
+
+	earthMesh->m_materials[0].ambient = vec3(0.1f, 0.1f, 0.1f);
+	earthMesh->m_materials[0].diffuse = vec3(1, 1, 1);
+	earthMesh->m_materials[0].specular = vec3(1, 1, 1);
+	earthMesh->m_materials[0].specularPower = 250.0f;
+
+	earthMesh->m_materials[0].ambientTexture.load(std::string(rootFolder + "\\textures\\earth_lights.png").c_str());
+	earthMesh->m_materials[0].diffuseTexture.load(std::string(rootFolder + "\\textures\\earth_diffuse.png").c_str());
+	earthMesh->m_materials[0].normalTexture.load(std::string(rootFolder + "\\textures\\earth_normal.png").c_str());
+	earthMesh->m_materials[0].specularTexture.load(std::string(rootFolder + "\\textures\\earth_specular.png").c_str());
+
+	earthMesh->gameObject = earthObject;
+	earthObject->components.push_back(earthMesh);
+	earthMesh->start();
+	//------------------------------------------------------------------------------
+
+	//------------------------------------------------------------------------------
+	GameObject* earthCloudObject = new GameObject();
+
+	earthCloudObject->transform->position = vec3(0, 15.0f, 0);
+	earthCloudObject->transform->scale = vec3(4.1f, 4.1f, 4.1f);
+	earthCloudObject->transform->onTransformUpdate();
+
+	OBJMesh* earthCloudMesh = new OBJMesh();
+
+	//mesh failed to load
+	if (earthCloudMesh->load(std::string(rootFolder + "/models/sphere.obj").c_str()) == false)
+	{
+		return false;
+	}
+
+	earthCloudMesh->useTexture = 1;
+	earthCloudMesh->spin = true;
+	earthCloudMesh->spinSpeed = 0.9f;
+
+	earthCloudMesh->m_materials[0].diffuse = vec3(1, 1, 1);
+	earthCloudMesh->m_materials[0].specular = vec3(0, 0, 0);
+
+	earthCloudMesh->m_materials[0].diffuseTexture.load(std::string(rootFolder + "\\textures\\earth_cloud.png").c_str());
+	earthCloudMesh->m_materials[0].alphaTexture.load(std::string(rootFolder + "\\textures\\earth_cloud_trans.png").c_str());
+
+	earthCloudMesh->usesAlpha = true;
+
+	earthCloudMesh->gameObject = earthCloudObject;
+	earthCloudObject->components.push_back(earthCloudMesh);
+	earthCloudMesh->start();
 	//------------------------------------------------------------------------------
 
 	//------------------------------------------------------------------------------
 	GameObject* directionObject = new GameObject;
 
-	DirectionalLight* dl = new DirectionalLight(&SHL->directionalLightPipe, &postRender.m_targets[1], &postRender.m_targets[2], &postRender.m_targets[3], &postRender.m_targets[4]);
+	DirectionalLight* dl = new DirectionalLight(&gRender.m_targets[2], &gRender.m_targets[3], &gRender.m_targets[4], &gRender.m_targets[5]);
 
+	dl->deferredShader = &SHL->directionalLightPipe;
+	dl->forwardShader = &SHL->tPassPipe;
 	dl->direction = vec3(1, -1, 1);
 	dl->diffuse = vec3(0.25f, 0.25f, 0.25f);
 	dl->specular = vec3(0.25f, 0.25f, 0.25f);
 
+	DirectionalLight* dl2 = new DirectionalLight(&gRender.m_targets[2], &gRender.m_targets[3], &gRender.m_targets[4], &gRender.m_targets[5]);
+
+	dl2->deferredShader = &SHL->directionalLightPipe;
+	dl2->forwardShader = &SHL->tPassPipe;
+	dl2->direction = vec3(-1, 1, -1);
+	dl2->diffuse = vec3(0.01f, 0.01f, 0.01f);
+	dl2->specular = vec3(0.01f, 0.01f, 0.01f);
+
 	dl->gameObject = directionObject;
 	directionObject->components.push_back(dl);
 	dl->start();
+
+	dl2->gameObject = directionObject;
+	directionObject->components.push_back(dl2);
+	dl2->start();
 	//------------------------------------------------------------------------------
 
 	//------------------------------------------------------------------------------
 	GameObject* pointObject = new GameObject();
 
-	PointLight* pl = new PointLight(&SHL->pointLightPipe, &postRender.m_targets[1], &postRender.m_targets[2], &postRender.m_targets[3], &postRender.m_targets[4]);
+	PointLight* pl = new PointLight(&gRender.m_targets[2], &gRender.m_targets[3], &gRender.m_targets[4], &gRender.m_targets[5]);
 
-	pl->position = vec3(-3.5, 0, 0);
+	pl->deferredShader = &SHL->pointLightPipe;
+	pl->forwardShader = &SHL->tPassPipe;
+	pl->position = vec3(-3.5f, 0.5f, -8.0f);
 	pl->radius = 10.0f;
-	pl->diffuse = vec3(0.25f, 0, 0.25f);
-	pl->specular = vec3(0.25f, 0.25f, 0.25f);
+	pl->diffuse = vec3(0.65f, 0, 0.65f);
+	pl->specular = vec3(0.25f, 0.0f, 0.25f);
 
 	pl->gameObject = pointObject;
 	pointObject->components.push_back(pl);
@@ -303,17 +514,18 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	//------------------------------------------------------------------------------
 	GameObject* spotObject = new GameObject();
 
-	spotObject->transform->position = vec3(10, 0, -5);
-	spotObject->transform->forward = glm::normalize(vec3(0.1f, 0.0f, 0.9f));
+	spotObject->transform->position = vec3(10, 2.5f, -10);
 	spotObject->transform->onTransformUpdate();
 
-	SpotLight* sl = new SpotLight(&SHL->spotLightPipe, &postRender.m_targets[1], &postRender.m_targets[2], &postRender.m_targets[3], &postRender.m_targets[4]);
-	
-	sl->position = vec3(0, 0, 0);
+	SpotLight* sl = new SpotLight(&gRender.m_targets[2], &gRender.m_targets[3], &gRender.m_targets[4], &gRender.m_targets[5]);
+
+	sl->deferredShader = &SHL->spotLightPipe;
+	sl->forwardShader = &SHL->tPassPipe;
+	sl->position = vec3(0, 2.5f, 0);
 	sl->direction = vec3(0, 0, 1);
 	sl->range = 15.0f;
-	sl->minCone = 0.1f;
-	sl->maxCone = 0.11f;
+	sl->minCone = 0.05f;
+	sl->maxCone = 0.06f;
 	sl->diffuse = vec3(0.5f, 0, 0);
 	sl->specular = vec3(0.5f, 0.5f, 0.5f);
 
@@ -323,10 +535,16 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	//------------------------------------------------------------------------------
 
 	scene->gameObjects.push_back(cameraObject);
-	scene->gameObjects.push_back(meshObject);
-	scene->gameObjects.push_back(meshObject2);
-	scene->gameObjects.push_back(meshObject3);
+	scene->gameObjects.push_back(bunnyObject);
+	scene->gameObjects.push_back(dragonObject);
+	scene->gameObjects.push_back(soulspearObject);
+	scene->gameObjects.push_back(buddhaObject);
+	scene->gameObjects.push_back(lucyObject);
 	scene->gameObjects.push_back(quadObject);
+	scene->gameObjects.push_back(glassObject);
+	scene->gameObjects.push_back(glassObject2);
+	scene->gameObjects.push_back(earthObject);
+	scene->gameObjects.push_back(earthCloudObject);
 
 	scene->gameObjects.push_back(lightGO);
 	scene->gameObjects.push_back(compGO);
@@ -335,8 +553,6 @@ bool Application::startup(unsigned int width, unsigned int height, const char wi
 	scene->gameObjects.push_back(spotObject);
 
 	scene->sortComponents();
-
-	INP->setCursorLockMode(ECursorLock::NONE);
 
 	return true;
 }
@@ -393,9 +609,17 @@ bool Application::update()
 }
 
 //clears the screen and fills it with a solid colour
-void Application::clearScreen(vec4 colour)
+void Application::clearScreen(vec4 colour, bool depthClear)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the screen and depth buffers
+	if (depthClear)
+	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the screen and depth buffers
+	}
+	else
+	{
+		glClear(GL_COLOR_BUFFER_BIT); //clear the screen buffer
+	}
+
 	glClearColor(colour.x, colour.y, colour.z, colour.w); //fills the screen with a solid colour
 	glEnable(GL_DEPTH_TEST); //enables the depth buffer to be used this render call
 }
@@ -403,42 +627,36 @@ void Application::clearScreen(vec4 colour)
 //render function, runs after the update
 void Application::draw()
 {
-
 	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
-	postRender.bind();
+	gRender.bind();
 	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
+	//clear the ambient buffer with skybox colours
+	float skyboxColour[4] = { 0.01f, 0.01f, 0.01f, 1 };
+	glClearTexImage(gRender.m_targets[0].getHandle(), 0, GL_RGBA, GL_FLOAT, skyboxColour);
+
+	//render the g-pass buffers (ambient, albedo, normal, position, specular, specularPower)
 	scene->draw(cameraObject, ERenderType::G_PASS);
-	postRender.unbind();
+	gRender.unbind();
 
+	//render the t-pass buffers (combined pixel data: lighting and texturing for all transparent objects)
+	gRender.bind();
+	scene->draw(cameraObject, ERenderType::T_PASS);
+	gRender.unbind();
+
+	//render the l-pass (lighting for opaque objects)
 	lightRender.bind();
 	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	scene->draw(cameraObject, ERenderType::LIGHTING_PASS);
 	lightRender.unbind();
 
+	//render the composite pass (combining the g, t and l pass buffers together)
 	compRender.bind();
 	clearScreen(vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	scene->draw(cameraObject, ERenderType::COMPOSITE_PASS);
 	compRender.unbind();
 
+	//render the post-processing pass (applies a fragment shader to a quad with the final texture for the scene)
 	scene->draw(cameraObject, ERenderType::POST_PROCESSING_PASS);
-
-	/*
-	Gizmos::clear(); //removes all existing gizmos
-
-	vec4 white(1);
-	vec4 black(0, 0, 0, 1);
-
-	for (int i = 0; i < 21; ++i) 
-	{
-		Gizmos::addLine(vec3(-10 + i, 0, 10), vec3(-10 + i, 0, -10), i == 10 ? white : black);
-		Gizmos::addLine(vec3(10, 0, -10 + i), vec3(-10, 0, -10 + i), i == 10 ? white : black);
-	}
-
-	Camera* c = (Camera*)cameraObject->components[1];
-
-	mat4 viewProjectionMatrix = c->projectionMatrix * c->gameObject->transform->translationMatrix;
-
-	Gizmos::draw(c->projectionMatrix * c->gameObject->transform->translationMatrix);
-	*/
 }

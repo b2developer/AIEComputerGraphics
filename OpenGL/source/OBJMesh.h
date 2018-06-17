@@ -19,6 +19,9 @@ class OBJMesh : public Renderable
 public:
 
 	int useTexture = false;
+	int useAmbientTexture = false;
+	int useNormalTexture = false;
+	int useSpecularTexture = false;
 
 	// a vertex structure for obj files
 	struct Vertex 
@@ -56,6 +59,8 @@ public:
 		Texture displacementTexture;		// bound slot 6
 	};
 
+	std::vector<Material>	m_materials;
+
 	OBJMesh();
 	~OBJMesh();
 
@@ -68,17 +73,6 @@ public:
 	* @returns void
 	*/
 	void start() override;
-
-	/*
-	* update
-	* overrides Renderable's update(float deltaTime)
-	*
-	* called once per frame
-	*
-	* @param float deltaTime - amount of time passed since the last frame
-	* @returns void
-	*/
-	void update(float deltaTime) override {}
 
 	// will fail if a mesh has already been loaded in to this instance
 	bool load(const char* filename, bool loadTextures = true, bool flipTextureV = false);
@@ -105,7 +99,7 @@ private:
 
 	std::string				m_filename;
 	std::vector<MeshChunk>	m_meshChunks;
-	std::vector<Material>	m_materials;
+	
 };
 
 } // namespace aie

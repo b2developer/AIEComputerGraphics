@@ -20,6 +20,8 @@ void Camera::calculateMatrices()
 //initialisation
 void Camera::start()
 {
+	gameObject->transform->inverted = true;
+
 	function<void()> f = [this] { calculateMatrices(); };
 	gameObject->transform->OnTransformUpdate.push_back(f);
 

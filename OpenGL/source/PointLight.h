@@ -22,8 +22,6 @@ class PointLight : public Light
 {
 public:
 
-	ShaderProgram * lightShader = nullptr;
-
 	Texture * positionBuffer = nullptr;
 	Texture * normalBuffer = nullptr;
 	Texture * specularBuffer = nullptr;
@@ -46,13 +44,12 @@ public:
 	* PointLight()
 	* constructor, assigns normal buffer
 	*
-	* @param ShaderProgram* lightShader - shader that renders the light
 	* @param Texture* positionBuffer - positional information
 	* @param Texture* normalBuffer - normal information
 	* @param Texture* specularBuffer - specular colour information
 	* @param Texture* specularPowerBuffer - the specular power
 	*/
-	PointLight(ShaderProgram* lightShader, Texture* positionBuffer, Texture* normalBuffer, Texture* specularBuffer, Texture* specularPowerBuffer);
+	PointLight(Texture* positionBuffer, Texture* normalBuffer, Texture* specularBuffer, Texture* specularPowerBuffer);
 
 	/*
 	* ~PointLight()
@@ -91,4 +88,15 @@ public:
 	* @returns void
 	*/
 	void draw(Camera* camera, ERenderType renderType) override;
+
+	/*
+	* bindLight
+	* overrides Light's bindLight(int position)
+	*
+	* assigns all of it's properties to the appropriate array in shader memory
+	*
+	* @param int pos - the position of the array to assign to
+	* @returns void
+	*/
+	void bindLight(int pos) override;
 };

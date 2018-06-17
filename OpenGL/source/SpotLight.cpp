@@ -5,11 +5,12 @@
 
 #include <gl_core_4_4.h>
 #include <GLFW/glfw3.h>
+#include <string>
 
 #include "ShaderLibrary.h"
 
 //constructor
-SpotLight::SpotLight(ShaderProgram* inLightShader, Texture* inPosition, Texture* inNormal, Texture* inSpecular, Texture* inSpecularP) : lightShader(inLightShader), positionBuffer(inPosition),
+SpotLight::SpotLight(Texture* inPosition, Texture* inNormal, Texture* inSpecular, Texture* inSpecularP) : positionBuffer(inPosition),
 normalBuffer(inNormal), specularBuffer(inSpecular), specularPowerBuffer(inSpecularP)
 {
 
@@ -88,14 +89,14 @@ void SpotLight::draw(Camera* camera, ERenderType renderType)
 	{
 		glCullFace(GL_FRONT);
 
-		lightShader->bind();
+		deferredShader->bind();
 
-		lightShader->bindUniform("lightType", 2);
+		deferredShader->bindUniform("lightType", 2);
 
-		lightShader->bindUniform("cameraPosition", camera->gameObject->transform->position);
+		deferredShader->bindUniform("cameraPosition", camera->gameObject->transform->position);
 
 		auto pvm = camera->viewMatrix * gameObject->transform->translationMatrix;
-		lightShader->bindUniform("ProjectionViewModel", pvm);
+		deferredShader->bindUniform("ProjectionViewModel", pvm);
 
 		//create the normal matrix (rotation matrix of the model)
 		mat3 nm = lookAtMatrix(vec3(0, 0, 0), gameObject->transform->forward, gameObject->transform->up);
@@ -107,20 +108,20 @@ void SpotLight::draw(Camera* camera, ERenderType renderType)
 		//simple trigonometry to find the horizonal span
 		float span = range / cosf(maxCone);
 
-		lightShader->bindUniform("scale", vec3(span, span, range) * 2.0f);
-		lightShader->bindUniform("lightPosition", gameObject->transform->position + nlp);
-		lightShader->bindUniform("lightDirection", nld);
-		lightShader->bindUniform("lightDiffuse", diffuse);
-		lightShader->bindUniform("lightSpecular", specular);
+		deferredShader->bindUniform("scale", vec3(span, span, range) * 2.0f);
+		deferredShader->bindUniform("lightPosition", gameObject->transform->position + nlp);
+		deferredShader->bindUniform("lightDirection", nld);
+		deferredShader->bindUniform("lightDiffuse", diffuse);
+		deferredShader->bindUniform("lightSpecular", specular);
 
-		lightShader->bindUniform("range", range);
-		lightShader->bindUniform("minCone", minCone);
-		lightShader->bindUniform("maxCone", maxCone);
+		deferredShader->bindUniform("range", range);
+		deferredShader->bindUniform("minCone", minCone);
+		deferredShader->bindUniform("maxCone", maxCone);
 
-		lightShader->bindUniform("positionTexture", 0);
-		lightShader->bindUniform("normalTexture", 1);
-		lightShader->bindUniform("specularTexture", 2);
-		lightShader->bindUniform("specularPowerTexture", 3);
+		deferredShader->bindUniform("positionTexture", 0);
+		deferredShader->bindUniform("normalTexture", 1);
+		deferredShader->bindUniform("specularTexture", 2);
+		deferredShader->bindUniform("specularPowerTexture", 3);
 
 		positionBuffer->bind(0);
 		normalBuffer->bind(1);
@@ -147,4 +148,41 @@ void SpotLight::draw(Camera* camera, ERenderType renderType)
 	}
 
 	glCullFace(GL_BACK);
+}
+
+//assigns in-shader properties to an array for this light
+void SpotLight::bindLight(int pos)
+{
+	string header = "lights[" + to_string(pos) + "].";
+
+	string targetString = header + "lightType";
+	forwardShader->bindUniform(targetString.c_str(), 2);
+
+	//create the normal matrix (rotation matrix of the model)
+	mat3 nm = lookAtMatrix(vec3(0, 0, 0), gameObject->transform->forward, gameObject->transform->up);
+
+	//rotatated light position
+	vec3 nlp = position * nm;
+	vec3 nld = direction * nm;
+
+	targetString = header + "lightPosition";
+	forwardShader->bindUniform(targetString.c_str(), nlp);
+
+	targetString = header + "lightDirection";
+	forwardShader->bindUniform(targetString.c_str(), nld);
+
+	targetString = header + "lightDiffuse";
+	forwardShader->bindUniform(targetString.c_str(), diffuse);
+
+	targetString = header + "lightSpecular";
+	forwardShader->bindUniform(targetString.c_str(), specular);
+
+	targetString = header + "range";
+	forwardShader->bindUniform(targetString.c_str(), range);
+
+	targetString = header + "minCone";
+	forwardShader->bindUniform(targetString.c_str(), minCone);
+
+	targetString = header + "maxCone";
+	forwardShader->bindUniform(targetString.c_str(), maxCone);
 }

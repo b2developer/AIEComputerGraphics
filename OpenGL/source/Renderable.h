@@ -13,6 +13,17 @@ class Renderable : public Component
 {
 public:
 
+	//controls the rendering process of the object
+	bool usesAlpha = false;
+
+	//used to determine transparency
+	float distance = 0.0f;
+
+	//spinning animation
+	bool spin = false;
+	float spinAngle = 0.0f;
+	float spinSpeed = 0.0f;
+
 	/*
 	* Renderable()
 	* default constructor
@@ -34,7 +45,7 @@ public:
 	*
 	* @returns void
 	*/
-	virtual void start() override {};
+	virtual void start() override {}
 
 	/*
 	* update
@@ -46,7 +57,7 @@ public:
 	* @param float deltaTime - amount of time passed since the last frame
 	* @returns void
 	*/
-	virtual void update(float deltaTime) override {}
+	virtual void update(float deltaTime) override;
 
 	/*
 	* draw
@@ -59,5 +70,5 @@ public:
 	* @param ERenderType renderType - the type of pass to perform on the fragment shader
 	* @returns void
 	*/
-	virtual void draw(Camera* camera, ERenderType renderType) override {};
+	virtual void draw(Camera* camera, ERenderType renderType) override {}
 };

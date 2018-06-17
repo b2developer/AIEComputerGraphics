@@ -14,6 +14,7 @@ using namespace aie;
 
 //forward declarations
 class GameObject;
+class Camera;
 class Light;
 class Renderable;
 
@@ -71,6 +72,16 @@ public:
 	void draw(GameObject* camera, ERenderType renderType);
 
 	/*
+	* sortTransparentObjects
+	*
+	* sorts the transparent objects by their distance to the current rendering camera
+	*
+	* @param Camera* camera - camera component that is rendering the scene
+	* @returns void
+	*/
+	void sortTransparentObjects(Camera* camera);
+
+	/*
 	* sortComponents
 	*
 	* sorts all components into lists 
@@ -84,6 +95,8 @@ private:
 
 	//sub-lists to sort to
 	vector<Renderable*> meshes;
+	vector<Renderable*> transparentMeshes;
+	vector<Renderable*> sortedTransparentMeshes;
 	vector<Renderable*> renderMeshes;
 	vector<Light*> lights;
 

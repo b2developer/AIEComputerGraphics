@@ -22,10 +22,12 @@ class Transform : public Component
 {
 public:
 
+	bool inverted = false;
+
 	vec3 position; //translation
 	vec3 forward; //rotation
 	vec3 up;
-	vec3 scale; //sacle
+	vec3 scale; //scale
 
 	mat4 translationMatrix;
 
@@ -102,6 +104,7 @@ public:
 * @param vec3 inPosition - the translation the matrix applies
 * @param vec3 inForward - controls pitch and yaw
 * @param vec3 inUp - controls roll
+* @param bool inverted
 * @returns mat4 - the completed matrix
 */
-mat4 lookAtMatrix(vec3 inPosition, vec3 inForward, vec3 inUp);
+mat4 lookAtMatrix(vec3 inPosition, vec3 inForward, vec3 inUp, bool inverted = false);
